@@ -3,17 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoJSON Map Viewer</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <title>D3 GeoJSON Map Viewer</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #e8f4f8;
         }
         #map {
             width: 100%;
             height: 100vh;
+            background: #e8f4f8;
+        }
+        .feature {
+            fill: #3388ff;
+            fill-opacity: 0.3;
+            stroke: #2c5aa0;
+            stroke-width: 1.5;
+            stroke-opacity: 0.8;
+            cursor: pointer;
+            transition: none;
+        }
+        .feature.highlighted {
+            fill: #ff7800;
+            fill-opacity: 0.6;
+            stroke: #ff7800;
+            stroke-width: 2.5;
+        }
+        .state-label {
+            font-size: 18px;
+            font-weight: 600;
+            fill: #333;
+            paint-order: stroke;
+            stroke: white;
+            stroke-width: 4px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+            text-anchor: middle;
+            opacity: 0.8;
         }
         .info-panel {
             position: absolute;
@@ -77,65 +106,98 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             font-size: 16px;
         }
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .controls button {
+            display: block;
+            width: 40px;
+            height: 40px;
+            margin: 5px 0;
+            border: none;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .controls button:hover {
+            background: #f0f0f0;
+        }
     </style>
 </head>
 <body>
-    <div id="map"></div>
+    <svg id="map"></svg>
+    
+    <div class="controls">
+        <button id="zoomIn" title="Zoom In">+</button>
+        <button id="zoomOut" title="Zoom Out">−</button>
+        <button id="reset" title="Reset View">⌂</button>
+    </div>
+    
     <div class="info-panel" id="infoPanel">
         <h3>Feature Info</h3>
         <div class="hint">Hover over features to see details</div>
     </div>
+    
     <div class="feature-count" id="featureCount" style="display: none;"></div>
     <div class="loading" id="loading">Loading map data...</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script>
-        // Initialize map centered on Australia with restricted bounds
-        const map = L.map('map', {
-            center: [-25, 133],
-            zoom: 4,
-            minZoom: 4,
-            maxZoom: 6,
-            maxBounds: [[-45, 110], [-5, 160]],
-            maxBoundsViscosity: 1.0
-        });
+        const width = window.innerWidth;
+        const height = window.innerHeight;
 
-        // Add simple CartoDB basemap (no labels)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap contributors © CARTO',
-            maxZoom: 19
-        }).addTo(map);
+        const svg = d3.select("#map")
+            .attr("width", width)
+            .attr("height", height);
 
-        // Add state/territory labels
+        const g = svg.append("g");
+
+        // State/territory labels data
         const labels = [
-            { name: 'Western Australia', coords: [-25, 122] },
-            { name: 'Northern Territory', coords: [-20, 133] },
-            { name: 'South Australia', coords: [-30, 135] },
-            { name: 'Queensland', coords: [-23, 145] },
-            { name: 'New South Wales', coords: [-32, 147] },
-            { name: 'Victoria', coords: [-37, 144] },
-            { name: 'Tasmania', coords: [-42, 147] }
+            { name: 'Western Australia', coords: [122, -25] },
+            { name: 'Northern Territory', coords: [133, -20] },
+            { name: 'South Australia', coords: [135, -30] },
+            { name: 'Queensland', coords: [145, -23] },
+            { name: 'New South Wales', coords: [147, -32] },
+            { name: 'Victoria', coords: [144, -37] },
+            { name: 'Tasmania', coords: [147, -42] }
         ];
 
-        labels.forEach(label => {
-            L.marker(label.coords, {
-                icon: L.divIcon({
-                    className: 'state-label',
-                    html: `<div style="
-                        font-size: 14px;
-                        font-weight: 600;
-                        color: #333;
-                        text-shadow: 1px 1px 2px white, -1px -1px 2px white, 1px -1px 2px white, -1px 1px 2px white;
-                        white-space: nowrap;
-                        pointer-events: none;
-                    ">${label.name}</div>`,
-                    iconSize: [100, 20]
-                })
-            }).addTo(map);
+        let projection, path, geojsonData;
+
+        // Zoom behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.8, 12])
+            .on("zoom", (event) => {
+                g.attr("transform", event.transform);
+            });
+
+        svg.call(zoom);
+
+        // Zoom controls
+        d3.select("#zoomIn").on("click", () => {
+            svg.transition().call(zoom.scaleBy, 1.5);
         });
 
-        let geojsonLayer = null;
+        d3.select("#zoomOut").on("click", () => {
+            svg.transition().call(zoom.scaleBy, 0.67);
+        });
+
+        d3.select("#reset").on("click", () => {
+            fitToMap();
+        });
+
         const infoPanel = document.getElementById('infoPanel');
+        const featureCount = document.getElementById('featureCount');
 
         // Function to update info panel
         function updateInfo(properties) {
@@ -154,27 +216,23 @@
             infoPanel.innerHTML = html;
         }
 
-        // Function to highlight feature
-        function highlightFeature(e) {
-            const layer = e.target;
+        function fitToMap() {
+            if (!geojsonData || !path) return;
             
-            layer.setStyle({
-                weight: 3,
-                color: '#ff7800',
-                fillOpacity: 0.6
-            });
+            const bounds = path.bounds(geojsonData);
+            const dx = bounds[1][0] - bounds[0][0];
+            const dy = bounds[1][1] - bounds[0][1];
+            const x = (bounds[0][0] + bounds[1][0]) / 2;
+            const y = (bounds[0][1] + bounds[1][1]) / 2;
+            const scale = Math.max(0.8, Math.min(12, 0.85 / Math.max(dx / width, dy / height)));
+            const translate = [width / 2 - scale * x, height / 2 - scale * y];
 
-            layer.bringToFront();
-            updateInfo(layer.feature.properties);
+            svg.transition()
+                .duration(750)
+                .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
         }
 
-        // Function to reset highlight
-        function resetHighlight(e) {
-            geojsonLayer.resetStyle(e.target);
-            updateInfo(null);
-        }
-
-        // Load the GeoJSON file
+        // Load and render GeoJSON
         fetch('RA_2021_AUST_GDA2020.json')
             .then(response => {
                 if (!response.ok) {
@@ -182,34 +240,106 @@
                 }
                 return response.json();
             })
-            .then(geojsonData => {
+            .then(data => {
                 document.getElementById('loading').style.display = 'none';
+                geojsonData = data;
 
-                // Add GeoJSON layer with styling and interactivity
-                geojsonLayer = L.geoJSON(geojsonData, {
-                    style: function(feature) {
-                        return {
-                            color: '#3388ff',
-                            weight: 2,
-                            opacity: 0.8,
-                            fillOpacity: 0.3,
-                            fillColor: '#3388ff'
-                        };
-                    },
-                    onEachFeature: function(feature, layer) {
-                        layer.on({
-                            mouseover: highlightFeature,
-                            mouseout: resetHighlight,
-                            click: function(e) {
-                                map.fitBounds(e.target.getBounds());
-                            }
-                        });
-                    }
-                }).addTo(map);
+                // Display feature count
+                const count = data.features ? data.features.length : 0;
+                featureCount.innerHTML = `<strong>${count}</strong> features loaded`;
+                featureCount.style.display = 'block';
 
-                // Fit map to GeoJSON bounds
-                map.fitBounds(geojsonLayer.getBounds());
-              })
+                // Use geoIdentity for projected coordinates (GDA2020)
+                // This treats the coordinates as already projected
+                projection = d3.geoIdentity()
+                    .reflectY(true)  // Flip Y axis since GeoJSON uses standard math coordinates
+                    .fitSize([width, height], data);
+                
+                path = d3.geoPath().projection(projection);
+
+                console.log('First feature coords:', data.features[0].geometry.coordinates);
+
+                // Draw features
+                const features = g.selectAll("path.feature")
+                    .data(data.features)
+                    .enter()
+                    .append("path")
+                    .attr("class", "feature")
+                    .attr("d", path)
+                    .on("mouseenter", function(event, d) {
+                        d3.select(this).classed("highlighted", true);
+                        updateInfo(d.properties);
+                    })
+                    .on("mouseleave", function() {
+                        d3.select(this).classed("highlighted", false);
+                        updateInfo(null);
+                    })
+                    .on("click", function(event, d) {
+                        const [[x0, y0], [x1, y1]] = path.bounds(d);
+                        event.stopPropagation();
+                        
+                        const dx = x1 - x0;
+                        const dy = y1 - y0;
+                        const x = (x0 + x1) / 2;
+                        const y = (y0 + y1) / 2;
+                        const scale = Math.max(1, Math.min(12, 0.9 / Math.max(dx / width, dy / height)));
+                        const translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+                        svg.transition()
+                            .duration(750)
+                            .call(
+                                zoom.transform,
+                                d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
+                            );
+                    });
+
+                // Add state labels using geographic coordinates
+                const labelProjection = d3.geoMercator()
+                    .center([133, -28])
+                    .scale(projection.scale())
+                    .translate(projection.translate());
+                
+                const labelGroup = g.append("g").attr("class", "labels");
+                
+                labelGroup.selectAll("text")
+                    .data(labels)
+                    .enter()
+                    .append("text")
+                    .attr("class", "state-label")
+                    .attr("x", d => labelProjection(d.coords)[0])
+                    .attr("y", d => labelProjection(d.coords)[1])
+                    .text(d => d.name);
+
+                // Fit to bounds with animation
+                fitToMap();
+            })
+            .catch(error => {
+                document.getElementById('loading').innerHTML = `Error: ${error.message}`;
+                console.error('Error loading GeoJSON:', error);
+            });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            svg.attr("width", newWidth).attr("height", newHeight);
+            
+            if (geojsonData && projection) {
+                projection.fitSize([newWidth, newHeight], geojsonData);
+                g.selectAll("path.feature").attr("d", path);
+                
+                const labelProjection = d3.geoMercator()
+                    .center([133, -28])
+                    .scale(projection.scale())
+                    .translate(projection.translate());
+                
+                g.selectAll(".state-label")
+                    .attr("x", d => labelProjection(d.coords)[0])
+                    .attr("y", d => labelProjection(d.coords)[1]);
+                
+                fitToMap();
+            }
+        });
     </script>
 </body>
 </html>
