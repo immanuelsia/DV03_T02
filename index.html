@@ -23,13 +23,16 @@
             stroke-width: 1.5;
             stroke-opacity: 0.8;
             cursor: pointer;
-            transition: none;
+            will-change: fill, stroke;
         }
         .feature.highlighted {
             fill: #ff7800;
             fill-opacity: 0.6;
             stroke: #ff7800;
             stroke-width: 2.5;
+        }
+        .feature-simple {
+            pointer-events: all;
         }
         .state-label {
             font-size: 18px;
@@ -259,19 +262,44 @@
 
                 console.log('First feature coords:', data.features[0].geometry.coordinates);
 
-                // Draw features
-                const features = g.selectAll("path.feature")
+                // Simplify geometries for better performance
+                const simplify = d3.geoPath().projection(projection);
+                
+                // Create a simplified version for hit detection
+                const hitAreaGroup = g.append("g").attr("class", "hit-areas");
+                const featureGroup = g.append("g").attr("class", "features");
+
+                // Draw features with simplified geometry
+                const features = featureGroup.selectAll("path.feature")
                     .data(data.features)
                     .enter()
                     .append("path")
                     .attr("class", "feature")
-                    .attr("d", path)
+                    .attr("d", d => path(d))
+                    .style("pointer-events", "none"); // Disable pointer events on visual layer
+
+                // Create invisible hit areas with simplified bounds
+                let hoveredFeature = null;
+                const hitAreas = hitAreaGroup.selectAll("path.hit-area")
+                    .data(data.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", d => path(d))
+                    .style("fill", "transparent")
+                    .style("stroke", "transparent")
+                    .style("stroke-width", "10")
+                    .style("cursor", "pointer")
                     .on("mouseenter", function(event, d) {
-                        d3.select(this).classed("highlighted", true);
+                        const index = data.features.indexOf(d);
+                        hoveredFeature = features.nodes()[index];
+                        d3.select(hoveredFeature).classed("highlighted", true);
                         updateInfo(d.properties);
                     })
                     .on("mouseleave", function() {
-                        d3.select(this).classed("highlighted", false);
+                        if (hoveredFeature) {
+                            d3.select(hoveredFeature).classed("highlighted", false);
+                            hoveredFeature = null;
+                        }
                         updateInfo(null);
                     })
                     .on("click", function(event, d) {
@@ -326,7 +354,8 @@
             
             if (geojsonData && projection) {
                 projection.fitSize([newWidth, newHeight], geojsonData);
-                g.selectAll("path.feature").attr("d", path);
+                g.selectAll("path.feature").attr("d", d => path(d));
+                g.selectAll("path.hit-area").attr("d", d => path(d));
                 
                 const labelProjection = d3.geoMercator()
                     .center([133, -28])
