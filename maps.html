@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Q3 & Q4 Maps — Dual View</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main style="max-width:1200px;margin:18px auto;padding:12px">
+    <h1 style="font-family:system-ui,Segoe UI,Roboto,Arial;">Dual maps — Q3 (AU) & Q4 (Remoteness)</h1>
+
+    <section class="map-card" id="card-q3">
+      <h2 style="margin:12px 18px 0">Map Q3 — Australia (au.json)</h2>
+      <div class="map-inner">
+        <svg id="map-q3" role="img" aria-label="Q3 map"></svg>
+        <div class="controls">
+          <button id="zoomIn-q3" title="Zoom In">+</button>
+          <button id="zoomOut-q3" title="Zoom Out">−</button>
+          <button id="reset-q3" title="Reset View">⌂</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="map-card" id="card-q4">
+      <h2 style="margin:12px 18px 0">Map Q4 — Remoteness (mapOfKangaroos.json)</h2>
+      <div class="map-inner">
+        <svg id="map-q4" role="img" aria-label="Q4 map"></svg>
+        <div class="controls">
+          <button id="zoomIn-q4" title="Zoom In">+</button>
+          <button id="zoomOut-q4" title="Zoom Out">−</button>
+          <button id="reset-q4" title="Reset View">⌂</button>
+        </div>
+      </div>
+    </section>
+
+    <p style="color:#666;margin:18px 0;font-size:14px">Scroll to view both maps. Use the controls on each card to zoom/reset. Hover features to see details in the info panel.</p>
+
+    <div class="info-panel" id="infoPanel">
+      <h3>Feature Info</h3>
+      <div class="hint">Hover over features to see details</div>
+    </div>
+
+  </main>
+
+  <div class="loading" id="loading">Loading map data...</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+  <script src="script/q3map.js"></script>
+  <script src="script/q4map.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  background: #e8f4f8;
+}
+
+/* Map card wrapper (centered) */
+.map-card {
+  max-width: 1100px;
+  margin: 36px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(16,24,40,0.08);
+  padding: 12px;
+  position: relative;
+}
+.map-inner{
+  width: 100%;
+  height: 520px; /* default card map height */
+  position: relative;
+  overflow: hidden;
+}
+#map {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ----------- FEATURES ----------- */
+.feature {
+  fill: #3388ff;
+  fill-opacity: 0.3;
+  stroke: #2c5aa0;
+  stroke-width: 1.2;
+  stroke-opacity: 0.8;
+  cursor: pointer;
+  pointer-events: all; /* ✅ Full clickable area */
+  transition: fill 0.25s ease, stroke 0.25s ease;
+}
+
+.feature.highlighted {
+  fill: #ff7800;
+  fill-opacity: 0.75;
+  stroke: #ff7800;
+  stroke-width: 3;
+  stroke-opacity: 1;
+  transition: fill 0.12s ease, stroke 0.12s ease, filter 0.12s ease;
+  filter: drop-shadow(0 6px 12px rgba(255,120,0,0.12));
+}
+
+/* Also apply a visible hover style as a fallback (in case JS events are missing) */
+.feature:hover {
+  fill: #ff9a4d;
+  fill-opacity: 0.6;
+  stroke: #ff7800;
+  stroke-width: 2.5;
+  stroke-opacity: 1;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.12));
+}
+
+/* Selected feature state (click) */
+.feature.selected {
+  stroke: #ff2e00;
+  stroke-width: 2.5;
+  fill-opacity: 0.7;
+}
+
+/* small tooltip near cursor when hovering */
+.map-tooltip {
+  background: rgba(8,10,15,0.9);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  z-index: 3000;
+}
+
+/* ensure tooltip sits above the svg and other positioned elements */
+.map-tooltip { position: fixed !important; z-index: 99999 !important; }
+
+/* ----------- LABELS ----------- */
+.state-label {
+  font-size: 18px;
+  font-weight: 600;
+  fill: #333;
+  paint-order: stroke;
+  stroke: white;
+  stroke-width: 4px;
+  text-anchor: middle;
+  opacity: 0.8;
+}
+
+/* Labels should not block pointer events on the map */
+.state-label { pointer-events: none; }
+
+/* ----------- INFO PANEL ----------- */
+.info-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.info-panel h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 2px solid #3388ff;
+  padding-bottom: 5px;
+}
+
+.property {
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.property-key {
+  font-weight: 600;
+  color: #555;
+}
+
+.property-value {
+  color: #333;
+  word-wrap: break-word;
+}
+
+.hint {
+  color: #999;
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* ----------- CONTROLS ----------- */
+.controls {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1100;
+  background: rgba(255,255,255,0.95);
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.08);
+}
+
+.controls button {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 5px 0;
+  border: none;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.controls button:hover {
+  background: #f0f0f0;
+}
+
+/* ----------- COUNTERS / LOADING ----------- */
+.feature-count,
+.loading {
+  position: absolute;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.feature-count {
+  bottom: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  z-index: 1000;
+}
+
+.loading {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px 30px;
+  font-size: 16px;
+  z-index: 2000;
+}
