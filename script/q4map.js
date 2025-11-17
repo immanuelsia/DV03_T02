@@ -10,7 +10,8 @@ let height = mapContainer ? Math.max(200, mapContainer.clientHeight) : window.in
 
 const svg = d3.select("#map-q4")
   .attr("width", width)
-  .attr("height", height);
+  .attr("height", height)
+  .style('cursor','grab');
 
 const g = svg.append("g");
 
@@ -18,16 +19,18 @@ const infoPanel = d3.select("#infoPanel-q4");
 const loading = d3.select("#loading-q4");
 
 let projection, path, geojsonData;
+// small horizontal shift (pixels) to nudge the map left
+const horizontalShift = 200;
 
 // Disable all zoom gestures, allow only programmatic zoom
 const zoom = d3.zoom()
   .scaleExtent([0.8, 12])
-  .on("zoom", (event) => g.attr("transform", event.transform));
+  .on("zoom", (event) => g.attr("transform", event.transform))
+  .on("start", () => svg.style('cursor','grabbing'))
+  .on("end", () => svg.style('cursor','grab'));
 
-svg.call(zoom)
-  .on("wheel.zoom", null)
-  .on("dblclick.zoom", null)
-  .on("mousedown.zoom", null);
+// Attach zoom to enable panning via drag, but disable wheel/dblclick zoom gestures
+svg.call(zoom).on("wheel.zoom", null).on("dblclick.zoom", null);
 
 // State labels (optional)
 const labels = [
@@ -66,7 +69,7 @@ function fitToMap() {
   const x = (bounds[0][0] + bounds[1][0]) / 2;
   const y = (bounds[0][1] + bounds[1][1]) / 2;
   const scale = Math.max(0.8, Math.min(12, 0.85 / Math.max(dx / width, dy / height)));
-  const translate = [width / 2 - scale * x, height / 2 - scale * y];
+  const translate = [width / 2 - scale * x - horizontalShift, height / 2 - scale * y];
 
   svg.transition()
     .duration(750)

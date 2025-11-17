@@ -21,6 +21,19 @@
           <button id="reset-q3" title="Reset View">⌂</button>
         </div>
       </div>
+      <div class="year-control" style="padding:12px 18px;display:flex;align-items:center;gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div id="mode-tabs-q3" style="display:flex;gap:6px;">
+              <button class="mode-tab" id="mode-camera-q3">Camera</button>
+              <button class="mode-tab" id="mode-police-q3">Police</button>
+              <button class="mode-tab" id="mode-both-q3">Both</button>
+            </div>
+            <div style="margin-left:auto">Year: <strong id="year-label-q3">2024</strong></div>
+          </div>
+          <input id="year-slider-q3" type="range" min="2018" max="2024" step="1" value="2024" style="width:100%" />
+        </div>
+      </div>
       <div class="info-panel" id="infoPanel-q3">
         <h3>Feature Info (Q3)</h3>
         <div class="hint">Hover over features to see details</div>
@@ -52,6 +65,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
   <script src="https://unpkg.com/topojson-client@3"></script>
+  <script src="script/load-q3data.js"></script>
   <script src="script/q3map.js"></script>
     <script src="script/q4map.js"></script>
 
