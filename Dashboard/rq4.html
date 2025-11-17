@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RQ4: Location Hotspots | Speeding Enforcement Insights Dashboard</title>
+    <link rel="stylesheet" href="css/styles-base.css">
+    <link rel="stylesheet" href="css/styles-questions.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1><a href="index.html" style="color: inherit; text-decoration: none;">Speeding Enforcement Insights Dashboard</a></h1>
+                <span class="nav-subtitle">COS30045 Data Visualization</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="rq1.html" class="nav-link">Detection Methods</a></li>
+                <li><a href="rq2.html" class="nav-link">Seasonal Patterns</a></li>
+                <li><a href="rq3.html" class="nav-link">Jurisdiction Analysis</a></li>
+                <li><a href="rq4.html" class="nav-link active">Location Hotspots</a></li>
+                <li><a href="rq5.html" class="nav-link">Age Demographics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> / <span>Research Question 4</span>
+            </div>
+            <h1 class="page-title">Location of Infractions by Jurisdiction</h1>
+            <p class="page-description">
+                Identifying hotspots and analyzing infraction distribution across location categories.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="viz-controls">
+                <label class="control-label">
+                    <span>Jurisdiction:</span>
+                    <select id="rq4-jurisdiction" class="control-select">
+                        <option value="all">All Jurisdictions</option>
+                        <option value="NSW">New South Wales</option>
+                        <option value="VIC">Victoria</option>
+                        <option value="QLD">Queensland</option>
+                        <option value="WA">Western Australia</option>
+                        <option value="SA">South Australia</option>
+                        <option value="TAS">Tasmania</option>
+                        <option value="ACT">Australian Capital Territory</option>
+                        <option value="NT">Northern Territory</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="map-chart-layout">
+                <div class="map-container">
+                    <div id="rq4-map"></div>
+                </div>
+                <div class="chart-container-small">
+                    <canvas id="rq4-heatmap-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="insights">
+                <div class="insight-card">
+                    <h4>Urban Concentration</h4>
+                    <p><strong>73%</strong> of infractions occur in metropolitan areas, 
+                    despite representing only 40% of road network distance.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Remote Areas</h4>
+                    <p>Remote locations show <strong>23% higher severity</strong> of infractions 
+                    but lower detection rates.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Top Hotspot</h4>
+                    <p>Sydney CBD records the highest infractions at <strong>8,500 annually</strong>, 
+                    followed by Melbourne CBD and Brisbane.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section class="section section-dark">
+        <div class="container">
+            <h2 class="section-title">Location Analysis</h2>
+            
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3>🏙️ Metropolitan Dominance</h3>
+                    <p>
+                        Metropolitan areas account for the overwhelming majority of infractions across all 
+                        jurisdictions. This concentration reflects higher traffic volumes, more extensive camera 
+                        infrastructure, and focused enforcement in urban centers.
+                    </p>
+                    <ul>
+                        <li>Total metro infractions: ~167,000 (73%)</li>
+                        <li>Average metro rate: 3x regional areas</li>
+                        <li>Highest density: Sydney, Melbourne, Brisbane</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>🌾 Regional Patterns</h3>
+                    <p>
+                        Regional areas show moderate infraction rates, with significant variation based on tourism, 
+                        major highways, and local enforcement priorities. Holiday destinations show seasonal spikes 
+                        that align with tourist periods.
+                    </p>
+                    <ul>
+                        <li>Total regional infractions: ~48,000 (21%)</li>
+                        <li>Highway corridors show highest rates</li>
+                        <li>Tourist areas peak during holidays</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>🏜️ Remote Area Challenges</h3>
+                    <p>
+                        Remote areas represent only 6% of total infractions but show concerning patterns. Higher 
+                        severity offenses, longer response times, and limited enforcement capacity create unique 
+                        challenges for road safety in these regions.
+                    </p>
+                    <ul>
+                        <li>Total remote infractions: ~13,000 (6%)</li>
+                        <li>Higher average severity (+23%)</li>
+                        <li>Limited camera infrastructure</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>📍 Hotspot Identification</h3>
+                    <p>
+                        Specific locations consistently emerge as high-infraction zones. These hotspots often 
+                        correlate with complex road infrastructure, high traffic volumes, confusing signage, 
+                        or strategic enforcement locations.
+                    </p>
+                    <ul>
+                        <li>Top 10 locations: 35% of all infractions</li>
+                        <li>Motorway corridors dominate hotspots</li>
+                        <li>School zones show enforcement peaks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="page-navigation">
+                <a href="rq3.html" class="nav-btn nav-btn-secondary">← Previous: Jurisdiction Analysis</a>
+                <a href="rq5.html" class="nav-btn nav-btn-primary">Next: Age Demographics →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Speeding Enforcement Insights Dashboard</h3>
+                    <p>Created by group 2 COS30045</p>
+                    <p class="footer-year">© 2025</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Data Sources</h4>
+                    <p>Australian Bureau of Statistics</p>
+                    <p>State & Territory Traffic Authorities</p>
+                    <p>Department of Transport</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="js/rq4.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
+

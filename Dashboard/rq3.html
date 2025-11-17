@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RQ3: Jurisdiction Analysis | Speeding Enforcement Insights Dashboard</title>
+    <link rel="stylesheet" href="css/styles-base.css">
+    <link rel="stylesheet" href="css/styles-questions.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1><a href="index.html" style="color: inherit; text-decoration: none;">Speeding Enforcement Insights Dashboard</a></h1>
+                <span class="nav-subtitle">COS30045 Data Visualization</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="rq1.html" class="nav-link">Detection Methods</a></li>
+                <li><a href="rq2.html" class="nav-link">Seasonal Patterns</a></li>
+                <li><a href="rq3.html" class="nav-link active">Jurisdiction Analysis</a></li>
+                <li><a href="rq4.html" class="nav-link">Location Hotspots</a></li>
+                <li><a href="rq5.html" class="nav-link">Age Demographics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> / <span>Research Question 3</span>
+            </div>
+            <h1 class="page-title">Method Effectiveness by Jurisdiction</h1>
+            <p class="page-description">
+                Comparing detection method effectiveness across Australian states and territories.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="viz-controls">
+                <label class="control-label">
+                    <span>Detection Method:</span>
+                    <select id="rq3-method" class="control-select">
+                        <option value="camera">Camera Detection</option>
+                        <option value="police">Police Detection</option>
+                    </select>
+                </label>
+                <label class="control-label">
+                    <span>Metric:</span>
+                    <select id="rq3-metric" class="control-select">
+                        <option value="percapita">Per Capita Rate</option>
+                        <option value="total">Total Infractions</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="map-chart-layout">
+                <div class="map-container">
+                    <div id="rq3-map"></div>
+                </div>
+                <div class="chart-container-small">
+                    <canvas id="rq3-bar-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="insights">
+                <div class="insight-card">
+                    <h4>Highest Rate</h4>
+                    <p>Victoria shows the highest per-capita detection rate at <strong>127 infractions per 10,000 residents</strong>.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Camera Adoption</h4>
+                    <p>NSW leads in camera detection utilization with <strong>85%</strong> of total detections automated.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Regional Variation</h4>
+                    <p>Per capita rates vary by up to <strong>400%</strong> across jurisdictions, reflecting different 
+                    enforcement priorities and infrastructure.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section class="section section-dark">
+        <div class="container">
+            <h2 class="section-title">Jurisdiction Comparison</h2>
+            
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3>🏙️ Major State Analysis</h3>
+                    <p>
+                        NSW, Victoria, and Queensland, as the three most populous states, show distinct enforcement 
+                        patterns. Victoria's higher per-capita rate suggests more intensive enforcement, while 
+                        Queensland shows a balanced mix of detection methods.
+                    </p>
+                    <ul>
+                        <li>NSW: 77,000 total infractions</li>
+                        <li>VIC: 69,500 total infractions</li>
+                        <li>QLD: 51,800 total infractions</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>🌏 Territory Differences</h3>
+                    <p>
+                        ACT and NT show interesting contrasts. ACT's high camera adoption reflects urban density 
+                        and infrastructure investment, while NT's lower detection rates may relate to sparse 
+                        population distribution and vast distances.
+                    </p>
+                    <ul>
+                        <li>ACT: 84% camera detection</li>
+                        <li>NT: Higher proportion of police detection</li>
+                        <li>Geographic challenges affect enforcement</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>📊 Camera vs Police Distribution</h3>
+                    <p>
+                        Camera adoption varies significantly by jurisdiction, with larger states generally showing 
+                        higher automation rates. This reflects both infrastructure investment capacity and policy 
+                        decisions about enforcement approaches.
+                    </p>
+                    <ul>
+                        <li>High automation: NSW, VIC, ACT (>80%)</li>
+                        <li>Moderate: QLD, WA, SA (70-80%)</li>
+                        <li>Lower automation: TAS, NT (<70%)</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>🎯 Policy Implications</h3>
+                    <p>
+                        The variation in detection rates and methods suggests different policy priorities across 
+                        jurisdictions. Higher per-capita enforcement doesn't necessarily correlate with better road 
+                        safety outcomes, indicating the need for holistic evaluation.
+                    </p>
+                    <ul>
+                        <li>Enforcement intensity varies 4x across states</li>
+                        <li>Camera adoption ranges from 63% to 85%</li>
+                        <li>Population density influences method choice</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="page-navigation">
+                <a href="rq2.html" class="nav-btn nav-btn-secondary">← Previous: Seasonal Patterns</a>
+                <a href="rq4.html" class="nav-btn nav-btn-primary">Next: Location Hotspots →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Speeding Enforcement Insights Dashboard</h3>
+                    <p>Created by group 2 COS30045</p>
+                    <p class="footer-year">© 2025</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Data Sources</h4>
+                    <p>Australian Bureau of Statistics</p>
+                    <p>State & Territory Traffic Authorities</p>
+                    <p>Department of Transport</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="js/rq3.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
+

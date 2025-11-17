@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RQ1: Detection Methods | Speeding Enforcement Insights Dashboard</title>
+    <link rel="stylesheet" href="css/styles-base.css">
+    <link rel="stylesheet" href="css/styles-questions.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1><a href="index.html" style="color: inherit; text-decoration: none;">Speeding Enforcement Insights Dashboard</a></h1>
+                <span class="nav-subtitle">COS30045 Data Visualization</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="rq1.html" class="nav-link active">Detection Methods</a></li>
+                <li><a href="rq2.html" class="nav-link">Seasonal Patterns</a></li>
+                <li><a href="rq3.html" class="nav-link">Jurisdiction Analysis</a></li>
+                <li><a href="rq4.html" class="nav-link">Location Hotspots</a></li>
+                <li><a href="rq5.html" class="nav-link">Age Demographics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> / <span>Research Question 1</span>
+            </div>
+            <h1 class="page-title">Detection Method vs Outcomes</h1>
+            <p class="page-description">
+                Analyzing the relationship between detection methods (camera vs. police) 
+                and infraction outcomes over time.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="viz-controls">
+                <label class="control-label">
+                    <span>View By:</span>
+                    <select id="rq1-view" class="control-select">
+                        <option value="stacked">Stacked View</option>
+                        <option value="grouped">Grouped View</option>
+                        <option value="small-multiples">By Outcome</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="rq1-chart"></canvas>
+            </div>
+
+            <div id="rq1-small-multiples" class="small-multiples" style="display: none;">
+                <div class="small-multiple-item">
+                    <h4>Warning Issued</h4>
+                    <canvas id="rq1-warning"></canvas>
+                </div>
+                <div class="small-multiple-item">
+                    <h4>Fine Issued</h4>
+                    <canvas id="rq1-fine"></canvas>
+                </div>
+                <div class="small-multiple-item">
+                    <h4>Court Summons</h4>
+                    <canvas id="rq1-court"></canvas>
+                </div>
+            </div>
+
+            <div class="insights">
+                <div class="insight-card">
+                    <h4>Key Finding</h4>
+                    <p>Camera detections have increased by <strong>145%</strong> over the past 5 years, 
+                    while police detections remain relatively stable.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Pattern</h4>
+                    <p>Fine issuance is the most common outcome for camera detections (<strong>92%</strong>), 
+                    compared to <strong>68%</strong> for police detections.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Trend</h4>
+                    <p>Court summons outcomes show steady growth for camera detections, while police-issued 
+                    court summons have slightly declined.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section class="section section-dark">
+        <div class="container">
+            <h2 class="section-title">Detailed Analysis</h2>
+            
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3>📹 Camera Detection Trends</h3>
+                    <p>
+                        Camera-based detection methods have seen substantial growth from 2019 to 2024. 
+                        The data reveals that fine issuance dominates camera detection outcomes, accounting 
+                        for over 90% of all camera-detected infractions. This high percentage suggests that 
+                        camera detections are primarily used for clear-cut, easily verifiable infractions.
+                    </p>
+                    <ul>
+                        <li>2019: 16,650 total camera detections</li>
+                        <li>2024: 38,850 total camera detections</li>
+                        <li>Growth rate: 133% increase</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>👮 Police Detection Patterns</h3>
+                    <p>
+                        Police detections show a more balanced distribution across all three outcome types. 
+                        The higher proportion of warnings (35% vs. 7% for cameras) suggests that police 
+                        officers exercise more discretion in enforcement, considering factors beyond the 
+                        mechanical detection of infractions.
+                    </p>
+                    <ul>
+                        <li>Warning rate: ~35% of all police detections</li>
+                        <li>Fine rate: ~48% of all police detections</li>
+                        <li>Court summons: ~17% of all police detections</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>📊 Outcome Distribution</h3>
+                    <p>
+                        The stark difference in outcome distribution between detection methods highlights 
+                        the automated nature of camera systems versus the human judgment involved in police 
+                        stops. Camera systems consistently apply penalties, while police enforcement shows 
+                        greater variability based on circumstances.
+                    </p>
+                    <ul>
+                        <li>Total warnings: Declining for police, stable for cameras</li>
+                        <li>Total fines: Increasing substantially for cameras</li>
+                        <li>Court summons: Growing for both methods</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>🔍 Implications</h3>
+                    <p>
+                        The shift towards camera-based enforcement has significant policy implications. 
+                        While cameras provide consistency and reduce bias, they lack the contextual awareness 
+                        that human officers bring. The data suggests a need for balanced enforcement strategies 
+                        that leverage both methods effectively.
+                    </p>
+                    <ul>
+                        <li>Consistency: Cameras ensure uniform enforcement</li>
+                        <li>Discretion: Police maintain situational judgment</li>
+                        <li>Efficiency: Cameras scale enforcement capacity</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="page-navigation">
+                <a href="index.html" class="nav-btn nav-btn-secondary">← Back to Home</a>
+                <a href="rq2.html" class="nav-btn nav-btn-primary">Next: Seasonal Patterns →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Speeding Enforcement Insights Dashboard</h3>
+                    <p>Created by group 2 COS30045</p>
+                    <p class="footer-year">© 2025</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Data Sources</h4>
+                    <p>Australian Bureau of Statistics</p>
+                    <p>State & Territory Traffic Authorities</p>
+                    <p>Department of Transport</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="js/rq1.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
+

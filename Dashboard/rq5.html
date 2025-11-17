@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RQ5: Age Demographics | Speeding Enforcement Insights Dashboard</title>
+    <link rel="stylesheet" href="css/styles-base.css">
+    <link rel="stylesheet" href="css/styles-questions.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1><a href="index.html" style="color: inherit; text-decoration: none;">Speeding Enforcement Insights Dashboard</a></h1>
+                <span class="nav-subtitle">COS30045 Data Visualization</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="rq1.html" class="nav-link">Detection Methods</a></li>
+                <li><a href="rq2.html" class="nav-link">Seasonal Patterns</a></li>
+                <li><a href="rq3.html" class="nav-link">Jurisdiction Analysis</a></li>
+                <li><a href="rq4.html" class="nav-link">Location Hotspots</a></li>
+                <li><a href="rq5.html" class="nav-link active">Age Demographics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> / <span>Research Question 5</span>
+            </div>
+            <h1 class="page-title">Age Groups Adjusted for License Holders</h1>
+            <p class="page-description">
+                Analyzing infraction rates per 10,000 license holders across different age demographics.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="viz-controls">
+                <label class="control-label">
+                    <span>Chart Style:</span>
+                    <select id="rq5-style" class="control-select">
+                        <option value="bar">Bar Chart</option>
+                        <option value="lollipop">Lollipop Chart</option>
+                    </select>
+                </label>
+                <label class="control-label">
+                    <span>Sort By:</span>
+                    <select id="rq5-sort" class="control-select">
+                        <option value="age">Age Group</option>
+                        <option value="rate">Infraction Rate</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="rq5-chart"></canvas>
+            </div>
+
+            <div id="rq5-lollipop" class="lollipop-container" style="display: none;">
+                <svg id="rq5-lollipop-svg"></svg>
+            </div>
+
+            <div class="insights">
+                <div class="insight-card">
+                    <h4>Highest Risk Group</h4>
+                    <p>Drivers aged <strong>17-24</strong> show the highest infraction rate at 
+                    <strong>284 per 10,000 license holders</strong>.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Safest Group</h4>
+                    <p>Drivers aged <strong>55-64</strong> demonstrate the lowest infraction rate, 
+                    with only <strong>67 per 10,000 license holders</strong>.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Trend</h4>
+                    <p>Infraction rates show a steady <strong>declining trend</strong> with increasing age, 
+                    with a slight uptick in the 75+ category.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section class="section section-dark">
+        <div class="container">
+            <h2 class="section-title">Demographic Analysis</h2>
+            
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3>👥 Young Drivers (17-24)</h3>
+                    <p>
+                        Young drivers show dramatically higher infraction rates even when adjusted for the number 
+                        of license holders. This group's rate is 4.2x higher than the safest age group, indicating 
+                        significant risk factors including inexperience, risk-taking behavior, and lifestyle patterns.
+                    </p>
+                    <ul>
+                        <li>Rate: 284 per 10,000 license holders</li>
+                        <li>Total infractions: 35,500</li>
+                        <li>Most common: Speeding and mobile phone use</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>🚗 Young Adults (25-34)</h3>
+                    <p>
+                        The 25-34 age group shows elevated but declining infraction rates compared to teenagers. 
+                        This transition period reflects increasing driving experience and potentially more stable 
+                        lifestyle patterns, though rates remain notably above middle-aged drivers.
+                    </p>
+                    <ul>
+                        <li>Rate: 230 per 10,000 license holders</li>
+                        <li>Total infractions: 48,300</li>
+                        <li>19% reduction from 17-24 group</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>👔 Middle-Aged Drivers (35-54)</h3>
+                    <p>
+                        Middle-aged drivers demonstrate significantly lower infraction rates, reflecting decades 
+                        of driving experience, established routines, and potentially different time pressures. 
+                        This group represents the baseline for safe driving behavior.
+                    </p>
+                    <ul>
+                        <li>35-44: 180 per 10,000 license holders</li>
+                        <li>45-54: 142 per 10,000 license holders</li>
+                        <li>Stable, responsible driving patterns</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>👴 Older Drivers (55+)</h3>
+                    <p>
+                        Older drivers show the lowest infraction rates across most age brackets, with the 55-64 
+                        group demonstrating exceptional compliance. The slight increase in the 75+ category may 
+                        reflect changing abilities rather than intentional violations.
+                    </p>
+                    <ul>
+                        <li>55-64: 67 per 10,000 (lowest rate)</li>
+                        <li>65-74: 70 per 10,000</li>
+                        <li>75+: 90 per 10,000 (slight increase)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Additional Insights -->
+    <section class="section section-light">
+        <div class="container">
+            <h2 class="section-title">Policy Implications</h2>
+            
+            <div class="policy-grid">
+                <div class="policy-card">
+                    <div class="policy-icon">🎓</div>
+                    <h3>Targeted Education</h3>
+                    <p>
+                        The dramatic difference between young and experienced drivers suggests significant opportunity 
+                        for targeted education programs. Enhanced graduated licensing programs and mandatory 
+                        awareness training could help reduce the young driver infraction rate.
+                    </p>
+                </div>
+
+                <div class="policy-card">
+                    <div class="policy-icon">📊</div>
+                    <h3>Risk-Based Enforcement</h3>
+                    <p>
+                        Understanding age-based risk profiles enables more effective resource allocation. Focusing 
+                        enforcement and education on high-risk demographics and locations frequented by younger 
+                        drivers could yield better safety outcomes.
+                    </p>
+                </div>
+
+                <div class="policy-card">
+                    <div class="policy-icon">🔄</div>
+                    <h3>Behavioral Change</h3>
+                    <p>
+                        The clear improvement with age demonstrates that driver behavior can and does change. 
+                        Programs that accelerate this maturation process through peer mentoring or advanced 
+                        training could reduce infractions in younger cohorts.
+                    </p>
+                </div>
+
+                <div class="policy-card">
+                    <div class="policy-icon">💰</div>
+                    <h3>Insurance Implications</h3>
+                    <p>
+                        The data supports age-differentiated insurance premiums and could inform more granular 
+                        risk assessment models. The sharp decline from 17-24 to 25-34 justifies the common 
+                        insurance age threshold at 25.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="section section-dark">
+        <div class="container">
+            <div class="page-navigation">
+                <a href="rq4.html" class="nav-btn nav-btn-secondary">← Previous: Location Hotspots</a>
+                <a href="index.html" class="nav-btn nav-btn-primary">Back to Home →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Speeding Enforcement Insights Dashboard</h3>
+                    <p>Created by group 2 COS30045</p>
+                    <p class="footer-year">© 2025</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Data Sources</h4>
+                    <p>Australian Bureau of Statistics</p>
+                    <p>State & Territory Traffic Authorities</p>
+                    <p>Department of Transport</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="js/rq5.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
+
