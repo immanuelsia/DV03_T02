@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RQ5: Age Demographics | Speeding Enforcement Insights Dashboard</title>
+    <link rel="stylesheet" href="css/styles-base.css">
+    <link rel="stylesheet" href="css/styles-questions.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1><a href="index.html" style="color: inherit; text-decoration: none;">Speeding Enforcement Insights Dashboard</a></h1>
+                <span class="nav-subtitle">COS30045 Data Visualization</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="rq1.html" class="nav-link">Detection Methods</a></li>
+                <li><a href="rq2.html" class="nav-link">Seasonal Patterns</a></li>
+                <li><a href="rq3.html" class="nav-link">Jurisdiction Analysis</a></li>
+                <li><a href="rq4.html" class="nav-link">Location Hotspots</a></li>
+                <li><a href="rq5.html" class="nav-link active">Age Demographics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> / <span>Research Question 5</span>
+            </div>
+            <h1 class="page-title">Age Groups Adjusted for License Holders</h1>
+            <p class="page-description">
+                Analyzing infraction rates per 10,000 license holders across different age demographics.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="viz-controls">
+                <label class="control-label">
+                    <span>Year:</span>
+                    <select id="rq5-year" class="control-select">
+                        <option value="all">All Years</option>
+                    </select>
+                </label>
+                <label class="control-label">
+                    <span>Jurisdiction:</span>
+                    <select id="rq5-jurisdiction" class="control-select">
+                        <option value="all">All Jurisdictions</option>
+                    </select>
+                </label>
+            </div>
+
+            <div id="rq5-bubble-chart" class="chart-container" style="min-height: 600px; display: flex; align-items: center; justify-content: center;">
+                <p style="color: #6b7280;">Loading visualization...</p>
+            </div>
+
+            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
+                <h4 style="margin: 0 0 10px 0; color: #111827;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 8h.01"></path>
+                    </svg>
+                    How to Use This Visualization
+                </h4>
+                <ul style="margin: 0; padding-left: 20px; color: #4b5563; line-height: 1.8;">
+                    <li><strong>Bubble Position:</strong> X-axis shows age groups, Y-axis shows infraction rate per 10,000 license holders</li>
+                    <li><strong>Bubble Size:</strong> Larger bubbles represent more total infractions</li>
+                    <li><strong>Bubble Color:</strong> Each age group has a unique color for easy identification</li>
+                    <li><strong>Filters:</strong> Use the dropdowns above to filter by specific year or jurisdiction</li>
+                    <li><strong>Hover:</strong> Move your mouse over any bubble to see detailed statistics</li>
+                </ul>
+            </div>
+
+            <div class="insights">
+                <div class="insight-card">
+                    <h4>Highest Risk Group</h4>
+                    <p>Drivers aged <strong>26-39</strong> consistently show the highest infraction rate 
+                    when adjusted for license holders.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Safest Group</h4>
+                    <p>Drivers aged <strong>0-16</strong> demonstrate the lowest infraction rates across most 
+                    years and jurisdictions.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Trend</h4>
+                    <p>The trend shows that speeding offences per 10,000 licence holders rise sharply from younger drivers 
+                        into mid-adult age groups (17–64), peaking around 26–39 and 40–64, before declining significantly among drivers aged 65 and over.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section class="section section-dark">
+        <div class="container">
+            <h2 class="section-title">Demographic Analysis (2010-2024)</h2>
+            
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Young Drivers (17-25)
+                    </h3>
+                    <p>
+                        Young drivers consistently show the highest infraction rates across all jurisdictions 
+                        and years when adjusted for license holders. The bubble chart reveals significant 
+                        risk factors including inexperience, risk-taking behavior, and lifestyle patterns 
+                        that persist across different time periods.
+                    </p>
+                    <ul>
+                        <li>Consistently highest rate per 10,000 license holders</li>
+                        <li>Significant variation between jurisdictions</li>
+                        <li>Pattern remains stable over 2010-2024 period</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                        </svg>
+                        Young Adults (26-39)
+                    </h3>
+                    <p>
+                        The 26-39 age group shows moderate infraction rates, typically falling between young 
+                        drivers and middle-aged drivers. The bubble visualization reveals this transition period 
+                        where driving behavior becomes more stable, though regional variations are significant.
+                    </p>
+                    <ul>
+                        <li>Moderate infraction rates across all years</li>
+                        <li>Shows gradual improvement with age</li>
+                        <li>Significant jurisdiction-to-jurisdiction variation</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Middle-Aged Drivers (40-64)
+                    </h3>
+                    <p>
+                        Middle-aged drivers consistently demonstrate the lowest infraction rates per license holder 
+                        across most jurisdictions and years. The bubble chart clearly shows smaller bubble sizes 
+                        and lower rates, reflecting decades of driving experience and established safe driving patterns.
+                    </p>
+                    <ul>
+                        <li>Lowest rates in most years and jurisdictions</li>
+                        <li>Most stable behavior patterns over time</li>
+                        <li>Represents baseline for safe driving behavior</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <circle cx="12" cy="8" r="7"></circle>
+                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                        </svg>
+                        Senior Drivers (65 and over)
+                    </h3>
+                    <p>
+                        Senior drivers show varying patterns across jurisdictions. While generally maintaining 
+                        low infraction rates, the bubble chart reveals interesting differences by region. Use the 
+                        filters to explore specific jurisdictions and years for detailed insights.
+                    </p>
+                    <ul>
+                        <li>Generally low rates per 10,000 license holders</li>
+                        <li>Regional variation in patterns</li>
+                        <li>Data availability varies by jurisdiction</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Additional Insights -->
+    <section class="section section-light">
+        <div class="container">
+            <h2 class="section-title">Policy Implications</h2>
+            
+            <div class="policy-grid">
+                <div class="policy-card">
+                    <div class="policy-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                        </svg>
+                    </div>
+                    <h3>Targeted Education</h3>
+                    <p>
+                        The dramatic difference between young and experienced drivers suggests significant opportunity 
+                        for targeted education programs. Enhanced graduated licensing programs and mandatory 
+                        awareness training could help reduce the young driver infraction rate.
+                    </p>
+                </div>
+
+                <div class="policy-card">
+                    <div class="policy-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                    <h3>Risk-Based Enforcement</h3>
+                    <p>
+                        Understanding age-based risk profiles enables more effective resource allocation. Focusing 
+                        enforcement and education on high-risk demographics and locations frequented by younger 
+                        drivers could yield better safety outcomes.
+                    </p>
+                </div>
+
+                <div class="policy-card">
+                    <div class="policy-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                            <path d="M16 16h5v5"></path>
+                        </svg>
+                    </div>
+                    <h3>Behavioral Change</h3>
+                    <p>
+                        The clear improvement with age demonstrates that driver behavior can and does change. 
+                        Programs that accelerate this maturation process through peer mentoring or advanced 
+                        training could reduce infractions in younger cohorts.
+                    </p>
+                </div>
+
+                <div class="policy-card">
+                    <div class="policy-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <h3>Insurance Implications</h3>
+                    <p>
+                        The data supports age-differentiated insurance premiums and could inform more granular 
+                        risk assessment models. The sharp decline from 17-24 to 25-34 justifies the common 
+                        insurance age threshold at 25.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="section section-dark">
+        <div class="container">
+            <div class="page-navigation">
+                <a href="rq4.html" class="nav-btn nav-btn-secondary">← Previous: Location Hotspots</a>
+                <a href="index.html" class="nav-btn nav-btn-primary">Back to Home →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Speeding Enforcement Insights Dashboard</h3>
+                    <p>Created by group 2 COS30045</p>
+                    <p class="footer-year">© 2025</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Data Sources</h4>
+                    <p>Australian Bureau of Statistics</p>
+                    <p>State & Territory Traffic Authorities</p>
+                    <p>Department of Transport</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/rq5.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
+
