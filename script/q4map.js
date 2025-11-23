@@ -298,13 +298,27 @@ d3.json("mapOfKangaroos.json")
     });
 
   // --- CSV loading for Q4 ---
-  d3.csv('data/Q4DATA.csv', d3.autoType).then(rows => {
+  // Q4 CSV is loaded by `script/load-q4data.js`. That loader will call
+  // `window.initQ4Map(rows)` when the data is ready. We expose that function
+  // here so the loader can hand over the parsed rows and let this script
+  // compute lookups and stats.
+  window.initQ4Map = function(rows){
+    // reset lookup and stats
+    q4Lookup = {};
+    q4GlobalStats = {
+      'all': {min: Infinity, max: -Infinity},
+      '17-25': {min: Infinity, max: -Infinity},
+      '26-39': {min: Infinity, max: -Infinity},
+      '40-64': {min: Infinity, max: -Infinity},
+      '65 and over': {min: Infinity, max: -Infinity}
+    };
+
     // build lookup: q4Lookup[jurisdiction][age_group] = { offences, license }
     rows.forEach(r => {
       const code = (''+r.JURISDICTION).toUpperCase().trim();
       const age = (''+r.AGE_GROUP).trim();
       q4Lookup[code] = q4Lookup[code] || {};
-      q4Lookup[code][age] = { offences: Number(r['Sum(Combined Offences)'] || r['Sum(Combined Offences)'] === 0 ? r['Sum(Combined Offences)'] : r['Sum(Combined Offences)']), license: Number(r.License_holder || 0) };
+      q4Lookup[code][age] = { offences: Number(r['Sum(Combined Offences)'] || 0), license: Number(r.License_holder || 0) };
     });
 
     // compute global stats for each mode (per10k values)
@@ -354,11 +368,7 @@ d3.json("mapOfKangaroos.json")
 
     // Buttons are provided in the HTML (bottom control row). Just mark default mode.
     setQ4Mode(currentQ4Mode);
-
-  }).catch(err => {
-    console.error('Failed to load Q4 CSV:', err);
-    loading.html(`CSV Error: ${err.message}`);
-  });
+  };
 
   function tryUpdateQ4Choropleth(){
     if (!topoLoaded || !csvLoaded) return;
