@@ -20,7 +20,7 @@ const loading = d3.select("#loading-q3");
 
 let projection, path, geojsonData;
 // small horizontal shift (pixels) to nudge the map left
-const horizontalShift = 200;
+const horizontalShift = 150;
 
 // Disable all zoom gestures, allow only programmatic zoom
 const zoom = d3.zoom()
@@ -43,44 +43,147 @@ const labels = [
   { name: "Tasmania", coords: [147, -42] },
 ];
 
-// Info panel update - NOW SHOWS DATA VALUES
-function updateInfo(properties, dataValues) {
+// Info panel update: render a pie chart of Camera% vs Police% for the currently-hovered feature
+function updateInfo(properties) {
+  // clear existing content
+  infoPanel.html('');
   if (!properties) {
     infoPanel.html("<h3>Feature Info</h3><div class='hint'>Hover over features to see details</div>");
     return;
   }
+  // Header
+  infoPanel.append('h3').text('Feature Info');
 
-  let html = `<h3>${properties.name || properties.id || 'Unknown'}</h3>`;
-  
-  // Add data values if available
-  if (dataValues) {
-    html += `<div class="property">
-      <div class="property-key">Camera per 10k:</div>
-      <div class="property-value">${Math.round(dataValues.Camera_offence_per10k || 0)}</div>
-    </div>
-    <div class="property">
-      <div class="property-key">Police per 10k:</div>
-      <div class="property-value">${Math.round(dataValues.Police_offence_per10k || 0)}</div>
-    </div>
-    <div class="property">
-      <div class="property-key">Camera %:</div>
-      <div class="property-value">${(dataValues.Camera_Percentage || 0).toFixed(1)}%</div>
-    </div>
-    <div class="property">
-      <div class="property-key">Police %:</div>
-      <div class="property-value">${(dataValues.Police_Percentage || 0).toFixed(1)}%</div>
-    </div>`;
-  } else {
-    const props = Object.entries(properties)
-      .map(([k, v]) => `<div class="property">
-          <div class="property-key">${k}:</div>
-          <div class="property-value">${v}</div>
-        </div>`)
-      .join("");
-    html += props;
+  // determine jurisdiction code and lookup CSV row for current year
+  const code = getJurisdictionFromProps(properties);
+  const row = (code && q3DataLookup[code]) ? q3DataLookup[code][currentYear] : null;
+
+  // prepare values for pie chart: camera% and police%
+  let camPerc = null, polPerc = null;
+  if (row) {
+    camPerc = row.Camera_Percentage != null ? +row.Camera_Percentage : null;
+    polPerc = row.Police_Percentage != null ? +row.Police_Percentage : null;
+    // fallback: if percentages missing but counts present, compute percent share
+    if ((camPerc == null || polPerc == null) && (row.Camera_offence_per10k != null || row.Police_offence_per10k != null)){
+      const c = Number(row.Camera_offence_per10k) || 0;
+      const p = Number(row.Police_offence_per10k) || 0;
+      const total = c + p;
+      if(total > 0){
+        camPerc = camPerc == null ? (c/total)*100 : camPerc;
+        polPerc = polPerc == null ? (p/total)*100 : polPerc;
+      }
+    }
   }
 
-  infoPanel.html(html);
+  // Row: pie chart (left) and info (right)
+  const rowDiv = infoPanel.append('div').attr('class','q3-info-row');
+  const chartDiv = rowDiv.append('div').attr('class','q3-chart').node();
+  const infoBlock = rowDiv.append('div').attr('class','q3-info-block');
+
+  // draw pie if we have percentage values
+  const color = d3.scaleOrdinal().domain(['Camera','Police']).range(['#3388ff','#ff5a5a']);
+  if (camPerc != null && polPerc != null) {
+    const data = [ {label:'Camera', value:camPerc}, {label:'Police', value:polPerc} ];
+    const w = 180, h = 180, r = Math.min(w,h)/2;
+    const svgChart = d3.select(chartDiv).append('svg').attr('width', w).attr('height', h);
+    const gChart = svgChart.append('g').attr('transform', `translate(${w/2},${h/2})`);
+    const pie = d3.pie().value(d=>d.value);
+    const arc = d3.arc().innerRadius(r*0.35).outerRadius(r*0.9);
+
+    const arcs = gChart.selectAll('.arc').data(pie(data)).enter().append('g').attr('class','arc');
+    arcs.append('path').attr('d', arc).attr('fill', d=>color(d.data.label)).attr('stroke','white').attr('stroke-width',2);
+
+    // mini legend
+    const legend = infoBlock.append('div').attr('class','q3-legend');
+    data.forEach(d=>{
+      const item = legend.append('div').style('display','flex').style('align-items','center').style('gap','8px').style('margin','4px 0');
+      item.append('div').style('width','12px').style('height','12px').style('background', color(d.label)).style('border-radius','2px');
+      item.append('div').style('font-size','13px').html(`${d.label}: <strong>${d.value.toFixed(1)}%</strong>`);
+    });
+  } else {
+    infoBlock.append('div').attr('class','hint').text('No Camera/Police percentage data available for this feature/year.');
+  }
+
+  // show name and counts to the right of the pie
+  const name = (properties && (properties.RA_NAME21 || properties.name || properties.NAME || properties.id)) || 'Region';
+  const camCount = row && row.Camera_offence_per10k != null ? Number(row.Camera_offence_per10k) : null;
+  const polCount = row && row.Police_offence_per10k != null ? Number(row.Police_offence_per10k) : null;
+  infoBlock.append('div').attr('class','property').html(`<div class="property-key">Jurisdiction:</div><div class="property-value">${name}</div>`);
+  infoBlock.append('div').attr('class','property').html(`<div class="property-key">Camera (per10k):</div><div class="property-value">${camCount != null ? camCount.toLocaleString() : 'N/A'}</div>`);
+  infoBlock.append('div').attr('class','property').html(`<div class="property-key">Police (per10k):</div><div class="property-value">${polCount != null ? polCount.toLocaleString() : 'N/A'}</div>`);
+
+  // Line chart below: offences per10k across years for camera and police
+  const lineDiv = infoPanel.append('div').attr('class','q3-linechart');
+  const yearsData = [];
+  if (code && q3DataLookup[code]) {
+    Object.keys(q3DataLookup[code]).forEach(y => {
+      const r = q3DataLookup[code][y];
+      if(!r) return;
+      yearsData.push({ year: +y, camera: (r.Camera_offence_per10k != null ? Number(r.Camera_offence_per10k) : null), police: (r.Police_offence_per10k != null ? Number(r.Police_offence_per10k) : null) });
+    });
+  }
+  yearsData.sort((a,b)=>a.year - b.year);
+
+  if (yearsData.length > 0) {
+    // responsive width based on container (fall back to 300)
+    const containerWidth = (lineDiv.node && lineDiv.node() && lineDiv.node().clientWidth) ? lineDiv.node().clientWidth : 300;
+    const lw = Math.max(220, containerWidth);
+    const lh = 120;
+    // increase right margin so the final year label (e.g. 2024) isn't clipped
+    const margin = {top:6,right:30,bottom:22,left:30};
+    // clear any previous svg (safety)
+    lineDiv.selectAll('svg').remove();
+    const svgL = lineDiv.append('svg').attr('width', lw).attr('height', lh);
+    const innerW = lw - margin.left - margin.right;
+    const innerH = lh - margin.top - margin.bottom;
+    const gL = svgL.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleLinear().domain(d3.extent(yearsData, d=>d.year)).range([0, innerW]);
+    // if only a single year, expand domain so chart can render
+    const xDomain = d3.extent(yearsData, d=>d.year);
+    if (xDomain[0] === xDomain[1]) {
+      x.domain([xDomain[0] - 1, xDomain[1] + 1]);
+    }
+    // y domain should cover both camera and police values
+    const yMin = d3.min(yearsData, d => { const vals = [d.camera, d.police].filter(v=>v!=null); return vals.length? d3.min(vals):0; });
+    const yMax = d3.max(yearsData, d => { const vals = [d.camera, d.police].filter(v=>v!=null); return vals.length? d3.max(vals):1; });
+    const yMinSafe = (yMin == null || isNaN(yMin)) ? 0 : yMin;
+    const yMaxSafe = (yMax == null || isNaN(yMax)) ? 1 : yMax;
+    const yScale = d3.scaleLinear().domain([yMinSafe, yMaxSafe]).nice().range([innerH, 0]);
+
+    const lineCam = d3.line().defined(d=>d.camera!=null).x(d=>x(d.year)).y(d=>yScale(d.camera));
+    const linePol = d3.line().defined(d=>d.police!=null).x(d=>x(d.year)).y(d=>yScale(d.police));
+
+    // axes
+    const xAxis = d3.axisBottom(x).ticks(Math.min(6, yearsData.length)).tickFormat(d3.format('d'));
+    const yAxis = d3.axisLeft(yScale).ticks(3).tickFormat(d=>d.toFixed(0));
+    gL.append('g').attr('class','y axis').call(yAxis).selectAll('text').style('font-size','10px');
+    gL.append('g').attr('class','x axis').attr('transform', `translate(0,${innerH})`).call(xAxis).selectAll('text').style('font-size','10px');
+
+    // draw lines
+    gL.append('path').datum(yearsData).attr('fill','none').attr('stroke','#3388ff').attr('stroke-width',2).attr('d', lineCam);
+    gL.append('path').datum(yearsData).attr('fill','none').attr('stroke','#ff5a5a').attr('stroke-width',2).attr('d', linePol);
+
+    // points for camera
+    gL.selectAll('.pt-cam').data(yearsData.filter(d=>d.camera!=null)).enter().append('circle').attr('class','pt-cam')
+      .attr('r', d => (d.year === currentYear ? 5 : 3))
+      .attr('cx', d => x(d.year))
+      .attr('cy', d => yScale(d.camera))
+      .attr('fill', '#3388ff')
+      .attr('stroke', d => (d.year === currentYear ? '#222' : 'none'))
+      .attr('stroke-width', d => (d.year === currentYear ? 1.25 : 0));
+    // points for police
+    gL.selectAll('.pt-pol').data(yearsData.filter(d=>d.police!=null)).enter().append('circle').attr('class','pt-pol')
+      .attr('r', d => (d.year === currentYear ? 5 : 3))
+      .attr('cx', d => x(d.year))
+      .attr('cy', d => yScale(d.police))
+      .attr('fill', '#ff5a5a')
+      .attr('stroke', d => (d.year === currentYear ? '#222' : 'none'))
+      .attr('stroke-width', d => (d.year === currentYear ? 1.25 : 0));
+
+  } else {
+    infoPanel.append('div').attr('class','hint').text('No time-series offence data available for this feature.');
+  }
 }
 
 // Fit map to viewport
@@ -114,6 +217,12 @@ function tryUpdateChoropleth() {
 let q3DataLookup = {};
 let currentYear = 2024;
 let currentMode = 'both';
+// global min/max across all years, computed after CSV load
+let globalStats = {
+  camera: { min: Infinity, max: -Infinity },
+  police: { min: Infinity, max: -Infinity },
+  both:   { min: Infinity, max: -Infinity }
+};
 
 function getJurisdictionFromProps(props) {
   if (!props) return null;
@@ -156,17 +265,10 @@ function getValueByMode(row){
 }
 
 function updateChoropleth(year){
-  const values = [];
-  g.selectAll('.feature').each(function(d){
-    const code = getJurisdictionFromProps(d.properties);
-    const entry = (q3DataLookup[code] && q3DataLookup[code][year]) ? q3DataLookup[code][year] : null;
-    if(entry != null){
-      const val = getValueByMode(entry);
-      if(val != null) values.push(val);
-    }
-  });
-  const min = d3.min(values) ?? 0;
-  const max = d3.max(values) ?? 1;
+  // Use global min/max for the selected mode so the legend stays constant across years
+  const stats = globalStats[currentMode] || { min: 0, max: 1 };
+  const min = (stats.min != null) ? stats.min : 0;
+  const max = (stats.max != null) ? stats.max : 1;
   const interp = currentMode === 'camera' ? d3.interpolateBlues : 
                  (currentMode === 'police' ? d3.interpolateReds : d3.interpolateYlOrRd);
   const color = d3.scaleSequential().domain([min,max]).interpolator(interp);
@@ -192,6 +294,15 @@ d3.json("mapOfKangaroos.json")
     projection = d3.geoIdentity().reflectY(true).fitSize([width, height], data);
     path = d3.geoPath(projection);
 
+    // Create hover tooltip (shows basic feature info)
+    const tooltip = d3.select('body')
+      .append('div')
+      .attr('class', 'map-tooltip')
+      .style('position', 'fixed')
+      .style('pointer-events', 'none')
+      .style('display', 'none')
+      .style('z-index', 99999);
+
     // Draw features
     g.selectAll(".feature")
       .data(data.features)
@@ -202,13 +313,21 @@ d3.json("mapOfKangaroos.json")
       .on("mouseenter", function (event, d) {
         const code = getJurisdictionFromProps(d.properties);
         const entry = (q3DataLookup[code] && q3DataLookup[code][currentYear]) ? q3DataLookup[code][currentYear] : null;
-        
         d3.select(this).classed("highlighted", true).transition().duration(150).attr("fill-opacity", 0.55);
-        updateInfo(d.properties, entry);
+        updateInfo(d.properties);
+        // tooltip content
+        const name = (d.properties && (d.properties.RA_NAME21 || d.properties.RA_CODE21 || d.properties.name)) || 'Region';
+        tooltip.style('display','block').html(`<strong>${name}</strong>`);
+      })
+      .on('mousemove', function(event,d){
+        const cx = event.clientX || (event.pageX - window.scrollX);
+        const cy = event.clientY || (event.pageY - window.scrollY);
+        tooltip.style('left', (cx + 12) + 'px').style('top', (cy + 12) + 'px');
       })
       .on("mouseleave", function () {
         d3.select(this).transition().duration(150).attr("fill-opacity", 0.3).on('end', function(){ d3.select(this).classed('highlighted', false); });
         updateInfo(null);
+        tooltip.style('display','none');
       });
 
     // Click/select logic
@@ -220,7 +339,7 @@ d3.json("mapOfKangaroos.json")
         
         g.selectAll('.feature').classed('selected', false);
         d3.select(this).classed('selected', true);
-        updateInfo(d.properties, entry);
+        updateInfo(d.properties);
       });
 
     // Add labels
@@ -270,6 +389,38 @@ d3.csv('data/Q3DATA.csv', d3.autoType).then(rows => {
     q3DataLookup[code][+r.YEAR] = r;
   });
 
+  // compute global min/max for each display mode across all years
+  Object.keys(q3DataLookup).forEach(code => {
+    Object.keys(q3DataLookup[code]).forEach(yr => {
+      const row = q3DataLookup[code][yr];
+      if(!row) return;
+      const cam = (row.Camera_offence_per10k != null) ? Number(row.Camera_offence_per10k) : (row.Camera_Percentage != null ? Number(row.Camera_Percentage) : null);
+      const pol = (row.Police_offence_per10k != null) ? Number(row.Police_offence_per10k) : (row.Police_Percentage != null ? Number(row.Police_Percentage) : null);
+
+      if (cam != null && !isNaN(cam)) {
+        globalStats.camera.min = Math.min(globalStats.camera.min, cam);
+        globalStats.camera.max = Math.max(globalStats.camera.max, cam);
+      }
+      if (pol != null && !isNaN(pol)) {
+        globalStats.police.min = Math.min(globalStats.police.min, pol);
+        globalStats.police.max = Math.max(globalStats.police.max, pol);
+      }
+
+      // both uses the numeric offence_per10k values (fallback to 0 if missing)
+      const cnum = (!isNaN(Number(row.Camera_offence_per10k))) ? Number(row.Camera_offence_per10k) : 0;
+      const pnum = (!isNaN(Number(row.Police_offence_per10k))) ? Number(row.Police_offence_per10k) : 0;
+      const sum = cnum + pnum;
+      globalStats.both.min = Math.min(globalStats.both.min, sum);
+      globalStats.both.max = Math.max(globalStats.both.max, sum);
+    });
+  });
+  // normalize infinities to sensible defaults
+  ['camera','police','both'].forEach(k => {
+    if (globalStats[k].min === Infinity) globalStats[k].min = 0;
+    if (globalStats[k].max === -Infinity) globalStats[k].max = 1;
+  });
+  console.log('Global stats computed:', globalStats);
+
   // Debug NT
   console.log('NT 2024 data:', q3DataLookup['NT']?.[2024]);
 
@@ -283,6 +434,12 @@ d3.csv('data/Q3DATA.csv', d3.autoType).then(rows => {
     slider.on('input', (event) => {
       currentYear = +event.target.value;
       updateChoropleth(currentYear);
+      // if a feature is currently selected, refresh its info panel so the mini-chart updates
+      const sel = g.select('.feature.selected');
+      if (!sel.empty()) {
+        const selDatum = sel.datum();
+        if (selDatum && selDatum.properties) updateInfo(selDatum.properties);
+      }
     });
   }
 
@@ -315,15 +472,15 @@ function updateLegend(year, min, max, color) {
   }
   legend.html('');
   
-  const title = currentMode === 'both' ? 'Total Speeding Offences per 10k' : 
-                currentMode === 'camera' ? 'Camera Offences per 10k' : 'Police Offences per 10k';
+  const title = currentMode === 'both' ? 'Total Speeding Offences per 10k License Holders' : 
+                currentMode === 'camera' ? 'Camera Offences per 10k License Holders' : 'Police Offences per 10k License Holders';
   
   legend.append('div')
     .style('font-weight', 'bold')
     .style('margin-bottom', '8px')
     .text(`Legend: ${title}`);
 
-  const width = 200;
+  const width = 400;
   const height = 20;
   const svgLegend = legend.append('svg')
     .attr('width', width)

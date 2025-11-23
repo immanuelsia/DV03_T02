@@ -1,16 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>D3 GeoJSON Map Viewer (Optimized)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Q3 Map — How does the reliance on camera-based vs police-issued detection methods vary across jurisdictions between 2018 and 2024?</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main style="max-width:1200px;margin:18px auto;padding:12px">
-    <h1 style="font-family:system-ui,Segoe UI,Roboto,Arial;">Maps — Q3 and Q4</h1>
+    <h1 style="font-family:system-ui,Segoe UI,Roboto,Arial;">Q3 Map — How does the reliance on camera-based vs police-issued detection methods vary across jurisdictions between 2018 and 2024?</h1>
 
-    <!-- Q3 Map Card -->
     <section class="map-card" id="card-q3">
       <h2 style="margin:12px 18px 0">Q3 Map</h2>
       <div class="map-inner">
@@ -34,6 +33,7 @@
           <input id="year-slider-q3" type="range" min="2018" max="2024" step="1" value="2024" style="width:100%" />
         </div>
       </div>
+
       <div class="info-panel" id="infoPanel-q3">
         <h3>Feature Info (Q3)</h3>
         <div class="hint">Hover over features to see details</div>
@@ -42,32 +42,10 @@
       <div class="loading" id="loading-q3">Loading Q3 data...</div>
     </section>
 
-    <!-- Q4 Map Card -->
-    <section class="map-card" id="card-q4">
-      <h2 style="margin:12px 18px 0">Q4 Map</h2>
-      <div class="map-inner">
-        <svg id="map-q4" role="img" aria-label="Q4 Map"></svg>
-        <div class="controls">
-          <button id="zoomIn-q4" title="Zoom In">+</button>
-          <button id="zoomOut-q4" title="Zoom Out">−</button>
-          <button id="reset-q4" title="Reset View">⌂</button>
-        </div>
-      </div>
-      <div class="info-panel" id="infoPanel-q4">
-        <h3>Feature Info (Q4)</h3>
-        <div class="hint">Hover over features to see details</div>
-      </div>
-      <div class="feature-count" id="featureCount-q4" style="display:none;"></div>
-      <div class="loading" id="loading-q4">Loading Q4 data...</div>
-    </section>
-
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
   <script src="https://unpkg.com/topojson-client@3"></script>
-  <script src="script/load-q3data.js"></script>
   <script src="script/q3map.js"></script>
-    <script src="script/q4map.js"></script>
-
 </body>
 </html>
