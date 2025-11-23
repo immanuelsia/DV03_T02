@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speeding Enforcement Insights Dashboard | COS30045</title>
+    <link rel="stylesheet" href="css/styles-base.css">
+    <link rel="stylesheet" href="css/styles-dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1><a href="index.html" style="color: inherit; text-decoration: none;">Speeding Enforcement Insights Dashboard</a></h1>
+                <span class="nav-subtitle">COS30045 Data Visualization</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="rq1.html" class="nav-link">Detection Methods</a></li>
+                <li><a href="rq2.html" class="nav-link">Seasonal Patterns</a></li>
+                <li><a href="rq3.html" class="nav-link">Jurisdiction Analysis</a></li>
+                <li><a href="rq4.html" class="nav-link">Location Hotspots</a></li>
+                <li><a href="rq5.html" class="nav-link">Age Demographics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">Visualisation Project 2025</div>
+            <h1 class="hero-title">Understanding Speeding<br>Enforcement Patterns</h1>
+            <p class="hero-description">
+                A comprehensive analysis of speeding enforcement detection methods, seasonal trends, 
+                and demographic patterns across Australian jurisdictions.
+            </p>
+            <div class="hero-buttons">
+                <a href="rq1.html" class="btn btn-primary">Explore Research</a>
+                <a href="#overview" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Research Questions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">Jurisdictions</div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section section-light">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Research Overview</h2>
+                <p class="section-description">
+                    This project explores five critical research questions about traffic infractions 
+                    in Australia, using modern data visualization techniques to uncover patterns and insights.
+                </p>
+            </div>
+
+            <div class="research-grid">
+                <a href="rq1.html" class="research-card">
+                    <div class="research-number">01</div>
+                    <h3>Detection Method vs Outcomes</h3>
+                    <p>Analyzing the relationship between camera and police detection methods and their resulting outcomes over time.</p>
+                    <div class="research-tags">
+                        <span class="tag">Bar Charts</span>
+                        <span class="tag">Time Series</span>
+                        <span class="tag">Small Multiples</span>
+                    </div>
+                    <div class="research-arrow">→</div>
+                </a>
+
+                <a href="rq2.html" class="research-card">
+                    <div class="research-number">02</div>
+                    <h3>Seasonal Patterns</h3>
+                    <p>Exploring monthly and yearly trends to identify seasonal patterns in traffic infractions across multiple years.</p>
+                    <div class="research-tags">
+                        <span class="tag">Heatmap</span>
+                        <span class="tag">Line Charts</span>
+                        <span class="tag">Temporal Analysis</span>
+                    </div>
+                    <div class="research-arrow">→</div>
+                </a>
+
+                <a href="rq3.html" class="research-card">
+                    <div class="research-number">03</div>
+                    <h3>Method Effectiveness by Jurisdiction</h3>
+                    <p>Comparing detection method effectiveness across Australian states and territories with geographic context.</p>
+                    <div class="research-tags">
+                        <span class="tag">Choropleth Map</span>
+                        <span class="tag">Bar Charts</span>
+                        <span class="tag">Per Capita</span>
+                    </div>
+                    <div class="research-arrow">→</div>
+                </a>
+
+                <a href="rq4.html" class="research-card">
+                    <div class="research-number">04</div>
+                    <h3>Location of Infractions</h3>
+                    <p>Identifying hotspots and analyzing infraction distribution across metropolitan, regional, and remote areas.</p>
+                    <div class="research-tags">
+                        <span class="tag">Hotspot Map</span>
+                        <span class="tag">Stacked Charts</span>
+                        <span class="tag">Location Analysis</span>
+                    </div>
+                    <div class="research-arrow">→</div>
+                </a>
+
+                <a href="rq5.html" class="research-card">
+                    <div class="research-number">05</div>
+                    <h3>Age Groups Analysis</h3>
+                    <p>Analyzing infraction rates per 10,000 license holders across different age demographics.</p>
+                    <div class="research-tags">
+                        <span class="tag">Bar Charts</span>
+                        <span class="tag">Lollipop Charts</span>
+                        <span class="tag">Demographics</span>
+                    </div>
+                    <div class="research-arrow">→</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Findings Section -->
+    <section class="section section-dark">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Key Findings Snapshot</h2>
+                <p class="section-description">
+                    High-level insights from our comprehensive analysis
+                </p>
+            </div>
+
+            <div class="findings-grid">
+                <div class="finding-card">
+                    <div class="finding-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </div>
+                    <h4>Camera Detection Growth</h4>
+                    <p class="finding-stat">+145%</p>
+                    <p>Camera detections have increased significantly over the past 5 years, while police detections remain stable.</p>
+                </div>
+
+                <div class="finding-card">
+                    <div class="finding-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <h4>Peak Season</h4>
+                    <p class="finding-stat">Dec-Jan</p>
+                    <p>Holiday months show 35% higher infraction rates, likely due to increased travel and tourist activity.</p>
+                </div>
+
+                <div class="finding-card">
+                    <div class="finding-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                            <line x1="8" y1="2" x2="8" y2="18"></line>
+                            <line x1="16" y1="6" x2="16" y2="22"></line>
+                        </svg>
+                    </div>
+                    <h4>Highest Per Capita</h4>
+                    <p class="finding-stat">Victoria</p>
+                    <p>Victoria leads with 127 infractions per 10,000 residents, followed by NSW and Queensland.</p>
+                </div>
+
+                <div class="finding-card">
+                    <div class="finding-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <h4>Urban Concentration</h4>
+                    <p class="finding-stat">73%</p>
+                    <p>Metropolitan areas account for nearly three-quarters of all infractions despite having less road distance.</p>
+                </div>
+
+                <div class="finding-card">
+                    <div class="finding-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h4>Highest Risk Age</h4>
+                    <p class="finding-stat">17-24</p>
+                    <p>Young drivers show 284 infractions per 10,000 license holders, the highest among all age groups.</p>
+                </div>
+
+                <div class="finding-card">
+                    <div class="finding-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <h4>Safest Drivers</h4>
+                    <p class="finding-stat">55-64</p>
+                    <p>Middle-aged drivers demonstrate the lowest infraction rate with only 67 per 10,000 license holders.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section section-light">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="section-title">About This Project</h2>
+                    <p>
+                        This comprehensive data visualization project examines speeding enforcement patterns 
+                        across Australia, providing insights into detection methods, temporal trends, 
+                        geographic distribution, and demographic patterns.
+                    </p>
+                    <p>
+                        Using modern visualization techniques including interactive charts, maps, and 
+                        heatmaps, we transform complex datasets into actionable insights that can inform 
+                        traffic safety policies and speeding enforcement strategies.
+                    </p>
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <strong>Interactive Visualizations</strong>
+                            <p>Explore data dynamically with filters and controls</p>
+                        </div>
+                        <div class="feature-item">
+                            <strong>Multiple Perspectives</strong>
+                            <p>View data through different chart types and metrics</p>
+                        </div>
+                        <div class="feature-item">
+                            <strong>Comprehensive Coverage</strong>
+                            <p>Analysis across 8 jurisdictions and 6 years of data</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-stats-large">
+                    <div class="about-stat-item">
+                        <div class="about-stat-value">228,000+</div>
+                        <div class="about-stat-label">Infractions Analyzed</div>
+                    </div>
+                    <div class="about-stat-item">
+                        <div class="about-stat-value">6 Years</div>
+                        <div class="about-stat-label">Data Coverage</div>
+                    </div>
+                    <div class="about-stat-item">
+                        <div class="about-stat-value">8 States</div>
+                        <div class="about-stat-label">Jurisdictions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Speeding Enforcement Insights Dashboard</h3>
+                    <p>Created by group 2 COS30045</p>
+                    <p class="footer-year">© 2025</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Data Sources</h4>
+                    <p>Australian Bureau of Statistics</p>
+                    <p>State & Territory Traffic Authorities</p>
+                    <p>Department of Transport</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="main.js"></script>
+</body>
+</html>
