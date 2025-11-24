@@ -4,7 +4,7 @@
 .page-header {
     background: linear-gradient(to bottom, var(--beige-50) 0%, #ffffff 100%);
     color: var(--beige-800);
-    padding: 8rem 2rem 3rem;
+    padding: 4rem 2rem 2rem;
     margin-top: 70px;
     border-bottom: 1px solid var(--beige-200);
 }
@@ -392,7 +392,7 @@
 
 @media (max-width: 768px) {
     .page-header {
-        padding: 6rem 1rem 2rem;
+        padding: 3rem 1rem 1.5rem;
     }
     
     .page-title {
@@ -448,5 +448,295 @@
 
 .bubble-tooltip strong {
     color: #10b981;
+}
+
+/* ===== D3 MAP STYLES (RQ3 & RQ4) ===== */
+.map-card {
+  max-width: 1100px;
+  margin: 36px auto 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(16,24,40,0.08);
+  padding: 12px;
+  position: relative;
+}
+
+.map-inner {
+  width: 100%;
+  height: 520px;
+  position: relative;
+  overflow: hidden;
+}
+
+#rq3-map,
+#rq4-map {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* D3 Features */
+.feature {
+  fill-opacity: 0.3;
+  stroke: #2c5aa0;
+  stroke-width: 1.2;
+  stroke-opacity: 0.8;
+  cursor: pointer;
+  pointer-events: all;
+  transition: fill 0.25s ease, stroke 0.25s ease;
+}
+
+.feature.highlighted {
+  fill: #ff7800;
+  fill-opacity: 0.75;
+  stroke: #ff7800;
+  stroke-width: 3;
+  stroke-opacity: 1;
+  transition: fill 0.12s ease, stroke 0.12s ease, filter 0.12s ease;
+  filter: drop-shadow(0 6px 12px rgba(255,120,0,0.12));
+}
+
+.feature:hover {
+  fill: #ff9a4d;
+  fill-opacity: 0.6;
+  stroke: #ff7800;
+  stroke-width: 2.5;
+  stroke-opacity: 1;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.12));
+}
+
+.feature.selected {
+  stroke: #ff2e00;
+  stroke-width: 2.5;
+  fill-opacity: 0.7;
+}
+
+/* Map tooltip */
+.map-tooltip {
+  background: rgba(8,10,15,0.9);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  z-index: 3000;
+  position: fixed !important;
+  z-index: 99999 !important;
+}
+
+/* State labels */
+.state-label {
+  font-size: 18px;
+  font-weight: 600;
+  fill: #333;
+  paint-order: stroke;
+  stroke: white;
+  stroke-width: 4px;
+  text-anchor: middle;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Info panel */
+.info-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Q3 Info panel - larger to show pie chart + line chart */
+#infoPanel-rq3 {
+  max-width: 400px;
+  min-width: 380px;
+  max-height: 85vh;
+}
+
+.info-panel h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 2px solid #3388ff;
+  padding-bottom: 5px;
+}
+
+.property {
+  margin: 8px 0;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.property-key {
+  font-weight: 600;
+  color: #555;
+}
+
+.property-value {
+  color: #333;
+  word-wrap: break-word;
+  text-align: right;
+}
+
+.hint {
+  color: #999;
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* Controls */
+.controls {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1100;
+  background: rgba(255,255,255,0.95);
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.08);
+}
+
+.controls button {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 5px 0;
+  border: none;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.controls button:hover {
+  background: #f0f0f0;
+}
+
+/* Mode tabs */
+.mode-tab {
+  border: none;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(2,6,23,0.06);
+  transition: all 0.2s ease;
+}
+
+.mode-tab:hover {
+  background: #f5f9ff;
+}
+
+.mode-tab.active {
+  background: linear-gradient(180deg, #3388ff, #2c5aa0);
+  color: white;
+  box-shadow: 0 8px 20px rgba(16,24,40,0.12);
+}
+
+/* Loading */
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px 30px;
+  font-size: 16px;
+  z-index: 2000;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Q3 info panel layout */
+.q3-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.q3-chart {
+  flex: 0 0 180px;
+  width: 180px;
+  height: 180px;
+}
+
+.q3-info-block {
+  flex: 1 1 150px;
+  min-width: 150px;
+}
+
+.q3-linechart {
+  margin-top: 12px;
+  width: 100%;
+  height: 140px;
+}
+
+.q3-linechart svg {
+  width: 100%;
+  height: 140px;
+  display: block;
+}
+
+.q3-legend {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Year control */
+.year-control {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.year-control input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Q4 pie chart */
+.q4-pie-wrap {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.q4-pie {
+  width: 180px;
+  height: 180px;
+}
+
+.q4-pie-legend {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Legend styles */
+#legend-rq3,
+#legend-rq4 {
+  margin: 12px 18px;
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 

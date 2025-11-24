@@ -10,12 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    
-    <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- D3.js and TopoJSON -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -52,31 +49,37 @@
     <!-- Main Content -->
     <section class="section section-light">
         <div class="container">
-            <div class="viz-controls">
-                <label class="control-label">
-                    <span>Jurisdiction:</span>
-                    <select id="rq4-jurisdiction" class="control-select">
-                        <option value="all">All Jurisdictions</option>
-                        <option value="NSW">New South Wales</option>
-                        <option value="VIC">Victoria</option>
-                        <option value="QLD">Queensland</option>
-                        <option value="WA">Western Australia</option>
-                        <option value="SA">South Australia</option>
-                        <option value="TAS">Tasmania</option>
-                        <option value="ACT">Australian Capital Territory</option>
-                        <option value="NT">Northern Territory</option>
-                    </select>
-                </label>
-            </div>
+            <section class="map-card" id="card-rq4">
+                <h2 style="margin:12px 18px 0">Age Group Analysis Map</h2>
+                <div class="map-inner">
+                    <svg id="rq4-map" role="img" aria-label="RQ4 Map"></svg>
+                    <div class="controls">
+                        <button id="zoomIn-rq4" title="Zoom In">+</button>
+                        <button id="zoomOut-rq4" title="Zoom Out">−</button>
+                        <button id="reset-rq4" title="Reset View">⌂</button>
+                    </div>
+                </div>
+                <div class="year-control" style="padding:12px 18px;display:flex;align-items:center;gap:12px;">
+                    <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div id="q4-mode-tabs" style="display:flex;gap:6px;">
+                                <button class="mode-tab" id="mode-all-rq4">All Ages</button>
+                                <button class="mode-tab" id="mode-17-25-rq4">17-25</button>
+                                <button class="mode-tab" id="mode-26-39-rq4">26-39</button>
+                                <button class="mode-tab" id="mode-40-64-rq4">40-64</button>
+                                <button class="mode-tab" id="mode-65-and-over-rq4">65+</button>
+                            </div>
+                            <div style="margin-left:auto"></div>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="map-chart-layout">
-                <div class="map-container">
-                    <div id="rq4-map"></div>
+                <div class="info-panel" id="infoPanel-rq4">
+                    <h3>Feature Info</h3>
+                    <div class="hint">Hover over features to see details</div>
                 </div>
-                <div class="chart-container-small">
-                    <canvas id="rq4-heatmap-chart"></canvas>
-                </div>
-            </div>
+                <div class="loading" id="loading-rq4">Loading data...</div>
+            </section>
 
             <div class="insights">
                 <div class="insight-card">
@@ -217,9 +220,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="data.js"></script>
     <script src="js/rq4.js"></script>
-    <script src="main.js"></script>
 </body>
 </html>
 

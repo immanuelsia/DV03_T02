@@ -10,12 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    
-    <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- D3.js and TopoJSON -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -52,31 +49,36 @@
     <!-- Main Content -->
     <section class="section section-light">
         <div class="container">
-            <div class="viz-controls">
-                <label class="control-label">
-                    <span>Detection Method:</span>
-                    <select id="rq3-method" class="control-select">
-                        <option value="camera">Camera Detection</option>
-                        <option value="police">Police Detection</option>
-                    </select>
-                </label>
-                <label class="control-label">
-                    <span>Metric:</span>
-                    <select id="rq3-metric" class="control-select">
-                        <option value="percapita">Per Capita Rate</option>
-                        <option value="total">Total Infractions</option>
-                    </select>
-                </label>
-            </div>
+            <section class="map-card" id="card-rq3">
+                <h2 style="margin:12px 18px 0">Jurisdiction Analysis Map</h2>
+                <div class="map-inner">
+                    <svg id="rq3-map" role="img" aria-label="RQ3 Map"></svg>
+                    <div class="controls">
+                        <button id="zoomIn-rq3" title="Zoom In">+</button>
+                        <button id="zoomOut-rq3" title="Zoom Out">−</button>
+                        <button id="reset-rq3" title="Reset View">⌂</button>
+                    </div>
+                </div>
+                <div class="year-control" style="padding:12px 18px;display:flex;align-items:center;gap:12px;">
+                    <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div id="mode-tabs-rq3" style="display:flex;gap:6px;">
+                                <button class="mode-tab" id="mode-camera-rq3">Camera</button>
+                                <button class="mode-tab" id="mode-police-rq3">Police</button>
+                                <button class="mode-tab" id="mode-both-rq3">Both</button>
+                            </div>
+                            <div style="margin-left:auto">Year: <strong id="year-label-rq3">2024</strong></div>
+                        </div>
+                        <input id="year-slider-rq3" type="range" min="2018" max="2024" step="1" value="2024" style="width:100%" />
+                    </div>
+                </div>
 
-            <div class="map-chart-layout">
-                <div class="map-container">
-                    <div id="rq3-map"></div>
+                <div class="info-panel" id="infoPanel-rq3">
+                    <h3>Feature Info</h3>
+                    <div class="hint">Hover over features to see details</div>
                 </div>
-                <div class="chart-container-small">
-                    <canvas id="rq3-bar-chart"></canvas>
-                </div>
-            </div>
+                <div class="loading" id="loading-rq3">Loading data...</div>
+            </section>
 
             <div class="insights">
                 <div class="insight-card">
@@ -218,9 +220,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="data.js"></script>
     <script src="js/rq3.js"></script>
-    <script src="main.js"></script>
 </body>
 </html>
 
