@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RQ1: Detection Methods | Speeding Enforcement Insights Dashboard</title>
+    <title>RQ1: Monthly Speeding Fines by Jurisdiction | Speeding Enforcement Insights Dashboard</title>
     <link rel="stylesheet" href="css/styles-base.css">
     <link rel="stylesheet" href="css/styles-questions.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <!-- D3.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -23,7 +23,7 @@
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="rq1.html" class="nav-link active">Detection Methods</a></li>
+                <li><a href="rq1.html" class="nav-link active">Monthly Fines</a></li>
                 <li><a href="rq2.html" class="nav-link">Seasonal Patterns</a></li>
                 <li><a href="rq3.html" class="nav-link">Jurisdiction Analysis</a></li>
                 <li><a href="rq4.html" class="nav-link">Location Hotspots</a></li>
@@ -38,10 +38,9 @@
             <div class="breadcrumb">
                 <a href="index.html">Home</a> / <span>Research Question 1</span>
             </div>
-            <h1 class="page-title">Detection Method vs Outcomes</h1>
+            <h1 class="page-title">Monthly Speeding Fines by Jurisdiction</h1>
             <p class="page-description">
-                Analyzing the relationship between detection methods (camera vs. police) 
-                and infraction outcomes over time.
+                Analyzing how monthly speeding fines differ <strong>across</strong> Australian jurisdictions in <strong>2024</strong>.
             </p>
         </div>
     </section>
@@ -49,51 +48,26 @@
     <!-- Main Content -->
     <section class="section section-light">
         <div class="container">
-            <div class="viz-controls">
-                <label class="control-label">
-                    <span>View By:</span>
-                    <select id="rq1-view" class="control-select">
-                        <option value="stacked">Stacked View</option>
-                        <option value="grouped">Grouped View</option>
-                        <option value="small-multiples">By Outcome</option>
-                    </select>
-                </label>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="rq1-chart"></canvas>
-            </div>
-
-            <div id="rq1-small-multiples" class="small-multiples" style="display: none;">
-                <div class="small-multiple-item">
-                    <h4>Warning Issued</h4>
-                    <canvas id="rq1-warning"></canvas>
-                </div>
-                <div class="small-multiple-item">
-                    <h4>Fine Issued</h4>
-                    <canvas id="rq1-fine"></canvas>
-                </div>
-                <div class="small-multiple-item">
-                    <h4>Court Summons</h4>
-                    <canvas id="rq1-court"></canvas>
-                </div>
+            <div class="viz-card">
+                <h2>Interactive Multi-Line Chart</h2>
+                <p style="margin-bottom: 1.5rem; color: #666;">Select jurisdictions to compare monthly fine trends throughout 2024.</p>
+                
+                <div id="rq1-controls"></div>
+                <div id="rq1-chart"></div>
             </div>
 
             <div class="insights">
                 <div class="insight-card">
-                    <h4>Key Finding</h4>
-                    <p>Camera detections have increased by <strong>145%</strong> over the past 5 years, 
-                    while police detections remain relatively stable.</p>
+                    <h4>Highest Monthly Fines</h4>
+                    <p>Victoria consistently records the highest monthly speeding fines, with peaks exceeding <strong>102,000 fines</strong> in single months.</p>
                 </div>
                 <div class="insight-card">
-                    <h4>Pattern</h4>
-                    <p>Fine issuance is the most common outcome for camera detections (<strong>92%</strong>), 
-                    compared to <strong>68%</strong> for police detections.</p>
+                    <h4>Seasonal Variation</h4>
+                    <p>Most jurisdictions show increased enforcement during <strong>March-May</strong> and <strong>August-November</strong> periods.</p>
                 </div>
                 <div class="insight-card">
-                    <h4>Trend</h4>
-                    <p>Court summons outcomes show steady growth for camera detections, while police-issued 
-                    court summons have slightly declined.</p>
+                    <h4>Regional Differences</h4>
+                    <p>Larger states (NSW, VIC, QLD) show significantly higher absolute numbers, while territories (ACT, NT) maintain lower but consistent patterns.</p>
                 </div>
             </div>
         </div>
@@ -102,47 +76,25 @@
     <!-- Analysis Section -->
     <section class="section section-dark">
         <div class="container">
-            <h2 class="section-title">Detailed Analysis</h2>
+            <h2 class="section-title">Jurisdiction Comparison Analysis</h2>
             
             <div class="analysis-grid">
                 <div class="analysis-card">
                     <h3>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                            <circle cx="12" cy="13" r="4"></circle>
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
-                        Camera Detection Trends
+                        Victoria's Leading Position
                     </h3>
                     <p>
-                        Camera-based detection methods have seen substantial growth from 2019 to 2024. 
-                        The data reveals that fine issuance dominates camera detection outcomes, accounting 
-                        for over 90% of all camera-detected infractions. This high percentage suggests that 
-                        camera detections are primarily used for clear-cut, easily verifiable infractions.
+                        Victoria consistently leads all jurisdictions in monthly speeding fines throughout 2024, 
+                        reflecting both its high population density and extensive automated enforcement infrastructure.
                     </p>
                     <ul>
-                        <li>2019: 16,650 total camera detections</li>
-                        <li>2024: 38,850 total camera detections</li>
-                        <li>Growth rate: 133% increase</li>
-                    </ul>
-                </div>
-
-                <div class="analysis-card">
-                    <h3>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                        </svg>
-                        Police Detection Patterns
-                    </h3>
-                    <p>
-                        Police detections show a more balanced distribution across all three outcome types. 
-                        The higher proportion of warnings (35% vs. 7% for cameras) suggests that police 
-                        officers exercise more discretion in enforcement, considering factors beyond the 
-                        mechanical detection of infractions.
-                    </p>
-                    <ul>
-                        <li>Warning rate: ~35% of all police detections</li>
-                        <li>Fine rate: ~48% of all police detections</li>
-                        <li>Court summons: ~17% of all police detections</li>
+                        <li>Peak month: March with 102,386 fines</li>
+                        <li>Average monthly: ~87,000 fines</li>
+                        <li>Consistent enforcement year-round</li>
                     </ul>
                 </div>
 
@@ -153,39 +105,56 @@
                             <line x1="12" y1="20" x2="12" y2="4"></line>
                             <line x1="6" y1="20" x2="6" y2="14"></line>
                         </svg>
-                        Outcome Distribution
+                        NSW and QLD Patterns
                     </h3>
                     <p>
-                        The stark difference in outcome distribution between detection methods highlights 
-                        the automated nature of camera systems versus the human judgment involved in police 
-                        stops. Camera systems consistently apply penalties, while police enforcement shows 
-                        greater variability based on circumstances.
+                        New South Wales and Queensland follow similar monthly trends with moderate seasonal variation. 
+                        Both states show increased enforcement during mid-year and spring periods.
                     </p>
                     <ul>
-                        <li>Total warnings: Declining for police, stable for cameras</li>
-                        <li>Total fines: Increasing substantially for cameras</li>
-                        <li>Court summons: Growing for both methods</li>
+                        <li>NSW average: ~75,000 monthly fines</li>
+                        <li>QLD average: ~52,000 monthly fines</li>
+                        <li>Similar seasonal patterns observed</li>
                     </ul>
                 </div>
 
                 <div class="analysis-card">
                     <h3>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                         </svg>
-                        Implications
+                        Territory Stability
                     </h3>
                     <p>
-                        The shift towards camera-based enforcement has significant policy implications. 
-                        While cameras provide consistency and reduce bias, they lack the contextual awareness 
-                        that human officers bring. The data suggests a need for balanced enforcement strategies 
-                        that leverage both methods effectively.
+                        ACT and NT demonstrate more stable monthly patterns with less variation. Their smaller populations 
+                        and focused enforcement areas result in consistent monthly figures.
                     </p>
                     <ul>
-                        <li>Consistency: Cameras ensure uniform enforcement</li>
-                        <li>Discretion: Police maintain situational judgment</li>
-                        <li>Efficiency: Cameras scale enforcement capacity</li>
+                        <li>ACT: 5,000-7,500 monthly range</li>
+                        <li>NT: Similar low-volume consistency</li>
+                        <li>Urban concentration effect visible</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="m16 12-4-4-4 4"></path>
+                            <path d="m12 16 0-8"></path>
+                        </svg>
+                        Seasonal Insights
+                    </h3>
+                    <p>
+                        Most jurisdictions show reduced fines during winter months (June-July) and holiday periods 
+                        (December-January), likely reflecting reduced travel and enforcement resources during these times.
+                    </p>
+                    <ul>
+                        <li>Winter dip: 10-15% reduction in June-July</li>
+                        <li>Holiday season: Lower December volumes</li>
+                        <li>Spring peak: October-November increases</li>
                     </ul>
                 </div>
             </div>
@@ -222,9 +191,8 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="data.js"></script>
+    <script src="script/load-q1data.js"></script>
     <script src="js/rq1.js"></script>
-    <script src="main.js"></script>
 </body>
 </html>
 
