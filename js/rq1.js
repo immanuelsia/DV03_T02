@@ -13,54 +13,121 @@ loadQ1Data().then(data => {
   
   // Build the control panel
   const controlsDiv = d3.select('#rq1-controls');
-  controlsDiv.attr('class', 'rq1-controls');
+  controlsDiv.attr('class', 'viz-controls');
   
-  // Create checkbox group
-  const checkboxGroup = controlsDiv.append('div').attr('class', 'checkbox-group');
+  // Create dropdown-style multi-select control
+  const dropdownContainer = controlsDiv.append('div')
+    .attr('class', 'control-label')
+    .style('position', 'relative');
   
-  // Add "Select All" checkbox
-  const selectAllLabel = checkboxGroup.append('label')
+  dropdownContainer.append('span').text('Select Jurisdictions:');
+  
+  // Create dropdown button
+  const dropdownButton = dropdownContainer.append('div')
+    .attr('class', 'control-select')
+    .style('cursor', 'pointer')
+    .style('display', 'flex')
+    .style('justify-content', 'space-between')
+    .style('align-items', 'center')
+    .style('user-select', 'none')
+    .html(`<span>All Jurisdictions (${jurisdictions.length})</span><span style="font-size: 0.7em;">▼</span>`);
+  
+  // Create dropdown menu
+  const dropdownMenu = dropdownContainer.append('div')
+    .style('position', 'absolute')
+    .style('top', '100%')
+    .style('left', '0')
+    .style('right', '0')
+    .style('background', 'white')
+    .style('border', '2px solid #e5e7eb')
+    .style('border-radius', '8px')
+    .style('box-shadow', '0 4px 6px rgba(0, 0, 0, 0.1)')
+    .style('margin-top', '4px')
+    .style('max-height', '300px')
+    .style('overflow-y', 'auto')
+    .style('z-index', '1000')
+    .style('display', 'none');
+  
+  // Add "Select All" option
+  const selectAllOption = dropdownMenu.append('label')
     .style('display', 'flex')
     .style('align-items', 'center')
-    .style('gap', '6px')
+    .style('padding', '10px 12px')
     .style('cursor', 'pointer')
+    .style('border-bottom', '1px solid #e5e7eb')
+    .style('background', '#f9fafb')
     .style('font-weight', '600')
-    .style('padding', '8px 12px')
-    .style('background', '#f0f0f0')
-    .style('border-radius', '4px');
+    .on('mouseover', function() {
+      d3.select(this).style('background', '#f3f4f6');
+    })
+    .on('mouseout', function() {
+      d3.select(this).style('background', '#f9fafb');
+    });
   
-  const selectAllCheckbox = selectAllLabel.append('input')
+  const selectAllCheckbox = selectAllOption.append('input')
     .attr('type', 'checkbox')
     .attr('id', 'select-all')
     .attr('checked', true)
-    .style('cursor', 'pointer');
+    .style('cursor', 'pointer')
+    .style('margin-right', '8px');
   
-  selectAllLabel.append('span').text('Select All');
+  selectAllOption.append('span').text('Select All');
   
   // Add individual jurisdiction checkboxes
   const checkboxes = {};
   jurisdictions.forEach(jurisdiction => {
-    const label = checkboxGroup.append('label')
+    const option = dropdownMenu.append('label')
       .style('display', 'flex')
       .style('align-items', 'center')
-      .style('gap', '6px')
+      .style('padding', '8px 12px')
       .style('cursor', 'pointer')
-      .style('padding', '6px 10px')
-      .style('border', '1px solid #ddd')
-      .style('border-radius', '4px')
-      .style('transition', 'all 0.2s');
+      .style('transition', 'background 0.2s')
+      .on('mouseover', function() {
+        d3.select(this).style('background', '#f3f4f6');
+      })
+      .on('mouseout', function() {
+        d3.select(this).style('background', 'white');
+      });
     
-    const checkbox = label.append('input')
+    const checkbox = option.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'jurisdiction-checkbox')
       .attr('value', jurisdiction)
       .attr('checked', true)
-      .style('cursor', 'pointer');
+      .style('cursor', 'pointer')
+      .style('margin-right', '8px');
     
-    label.append('span').text(jurisdiction);
+    option.append('span').text(jurisdiction);
     
     checkboxes[jurisdiction] = checkbox.node();
   });
+  
+  // Toggle dropdown visibility
+  let isDropdownOpen = false;
+  dropdownButton.on('click', function(event) {
+    event.stopPropagation();
+    isDropdownOpen = !isDropdownOpen;
+    dropdownMenu.style('display', isDropdownOpen ? 'block' : 'none');
+    dropdownButton.html(`<span>${getSelectedText()}</span><span style="font-size: 0.7em;">${isDropdownOpen ? '▲' : '▼'}</span>`);
+  });
+  
+  // Close dropdown when clicking outside
+  d3.select('body').on('click.rq1-dropdown', function(event) {
+    if (isDropdownOpen && !dropdownContainer.node().contains(event.target)) {
+      isDropdownOpen = false;
+      dropdownMenu.style('display', 'none');
+      dropdownButton.html(`<span>${getSelectedText()}</span><span style="font-size: 0.7em;">▼</span>`);
+    }
+  });
+  
+  // Function to get selected text
+  function getSelectedText() {
+    const selectedCount = jurisdictions.filter(j => checkboxes[j].checked).length;
+    if (selectedCount === 0) return 'No Jurisdictions Selected';
+    if (selectedCount === jurisdictions.length) return `All Jurisdictions (${jurisdictions.length})`;
+    if (selectedCount === 1) return jurisdictions.find(j => checkboxes[j].checked);
+    return `${selectedCount} Jurisdictions Selected`;
+  }
   
   // Set up the chart dimensions
   const chartContainer = d3.select('#rq1-chart');
@@ -1041,6 +1108,7 @@ loadQ1Data().then(data => {
     jurisdictions.forEach(j => {
       checkboxes[j].checked = isChecked;
     });
+    dropdownButton.html(`<span>${getSelectedText()}</span><span style="font-size: 0.7em;">${isDropdownOpen ? '▲' : '▼'}</span>`);
     updateChart();
   });
   
@@ -1049,6 +1117,7 @@ loadQ1Data().then(data => {
       // Update "Select All" checkbox state
       const allChecked = jurisdictions.every(j => checkboxes[j].checked);
       selectAllCheckbox.node().checked = allChecked;
+      dropdownButton.html(`<span>${getSelectedText()}</span><span style="font-size: 0.7em;">${isDropdownOpen ? '▲' : '▼'}</span>`);
       // Clear isolation when toggling checkboxes
       isolatedJurisdiction = null;
       hoveredJurisdiction = null;

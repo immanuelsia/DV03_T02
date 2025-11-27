@@ -85,6 +85,29 @@
 }
 
 /* ===== CHARTS ===== */
+.viz-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--beige-200);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.viz-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.viz-card h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--gray-900);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
 .chart-container {
     background: white;
     padding: 2rem;
@@ -93,6 +116,12 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
     position: relative;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.chart-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
 .chart-container canvas {
