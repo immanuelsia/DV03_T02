@@ -108,6 +108,86 @@ loadQ1Data().then(data => {
   const g = svg.append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
   
+  // Add color-blind toggle button (top-right position)
+  const toggleButton = svg.append('g')
+    .attr('class', 'colorblind-toggle')
+    .attr('transform', `translate(${containerWidth - 55}, 15)`)
+    .style('cursor', 'pointer');
+  
+  const toggleTitle = toggleButton.append('title')
+    .text('Enable color blind mode');
+  
+  toggleButton.append('rect')
+    .attr('width', 40)
+    .attr('height', 28)
+    .attr('rx', 4)
+    .attr('fill', '#f3f4f6')
+    .attr('stroke', '#d1d5db')
+    .attr('stroke-width', 1);
+  
+  // Add eye icon (centered in smaller button)
+  toggleButton.append('path')
+    .attr('d', 'M20 8 C15 8, 12 11, 12 14 C12 17, 15 20, 20 20 C25 20, 28 17, 28 14 C28 11, 25 8, 20 8 M20 10 C23 10, 25 12, 25 14 C25 16, 23 18, 20 18 C17 18, 15 16, 15 14 C15 12, 17 10, 20 10')
+    .attr('fill', '#374151')
+    .attr('transform', 'translate(0, 0)');
+  
+  toggleButton.append('circle')
+    .attr('cx', 20)
+    .attr('cy', 14)
+    .attr('r', 2)
+    .attr('fill', '#374151');
+  
+  // Add hover effects
+  toggleButton.on('mouseenter', function() {
+    toggleButton.select('rect')
+      .transition()
+      .duration(200)
+      .attr('transform', 'scale(1.05)');
+  });
+  
+  toggleButton.on('mouseleave', function() {
+    toggleButton.select('rect')
+      .transition()
+      .duration(200)
+      .attr('transform', 'scale(1)');
+  });
+  
+  toggleButton.on('click', function() {
+    isColorBlindMode = !isColorBlindMode;
+    
+    // Update button appearance
+    toggleButton.select('rect')
+      .attr('fill', isColorBlindMode ? '#10b981' : '#f3f4f6')
+      .attr('stroke', isColorBlindMode ? '#059669' : '#d1d5db');
+    
+    toggleButton.selectAll('path, circle')
+      .attr('fill', isColorBlindMode ? '#ffffff' : '#374151');
+    
+    // Update title text based on state
+    toggleTitle.text(isColorBlindMode ? 'Disable Colour-Blind Mode' : 'Enable Colour-Blind Mode');
+    
+    // Update all colors and enhance visual contrast in color-blind mode
+    updateChart();
+    
+    // Additional enhancements for color-blind mode
+    if (window.rq1AllLines) {
+      window.rq1AllLines
+        .transition()
+        .duration(500)
+        .attr('stroke-width', isColorBlindMode ? 3 : 2.5)
+        .style('opacity', isColorBlindMode ? 0.95 : 1);
+    }
+    
+    if (window.rq1AllCircles) {
+      window.rq1AllCircles
+        .transition()
+        .duration(500)
+        .attr('r', isColorBlindMode ? 5 : 4)
+        .style('stroke', isColorBlindMode ? '#000' : 'none')
+        .style('stroke-width', isColorBlindMode ? 1 : 0);
+    }
+  });
+  
   // Create tooltip
   const tooltip = d3.select('body').append('div')
     .attr('class', 'rq1-tooltip')
@@ -154,6 +234,28 @@ loadQ1Data().then(data => {
   const colorScale = d3.scaleOrdinal(d3.schemeTableau10)
     .domain(jurisdictions);
   
+  // Color-blind friendly palette (Okabe-Ito - gold standard)
+  const colorBlindPalette = [
+    '#0072B2', // Blue
+    '#009E73', // Green
+    '#F0E442', // Yellow
+    '#E69F00', // Orange
+    '#56B4E9', // Sky Blue
+    '#CC79A7', // Pink
+    '#D55E00', // Red
+    '#000000'  // Black
+  ];
+  const colorBlindScale = d3.scaleOrdinal(colorBlindPalette)
+    .domain(jurisdictions);
+  
+  // Toggle state for color-blind mode
+  let isColorBlindMode = false;
+  
+  // Function to get current color scale
+  function getCurrentColorScale() {
+    return isColorBlindMode ? colorBlindScale : colorScale;
+  }
+  
   // Create axes
   const xAxis = g.append('g')
     .attr('class', 'x-axis')
@@ -197,7 +299,7 @@ loadQ1Data().then(data => {
   // Create legend
   const legend = svg.append('g')
     .attr('class', 'legend')
-    .attr('transform', `translate(${width + margin.left + 10}, ${margin.top})`);
+    .attr('transform', `translate(${width + margin.left + 20}, ${margin.top})`);
   
   // State for hover and isolation
   let hoveredJurisdiction = null;
@@ -251,8 +353,9 @@ loadQ1Data().then(data => {
     const lines = linesGroup.selectAll('.line')
       .data(dataByJurisdiction, d => d.jurisdiction);
     
-    // Exit
+    // Exit - interrupt any existing transitions first
     lines.exit()
+      .interrupt()
       .transition()
       .duration(500)
       .style('opacity', 0)
@@ -269,9 +372,10 @@ loadQ1Data().then(data => {
     const allLines = linesEnter.merge(lines);
     
     allLines
+      .interrupt()
       .transition()
       .duration(500)
-      .attr('stroke', d => colorScale(d.jurisdiction))
+      .attr('stroke', d => getCurrentColorScale()(d.jurisdiction))
       .attr('d', d => line(d.values))
       .style('opacity', d => {
         if (isolatedJurisdiction) {
@@ -283,13 +387,15 @@ loadQ1Data().then(data => {
         return 1;
       })
       .attr('stroke-width', d => {
+        const baseWidth = isColorBlindMode ? 3 : 2.5;
+        const highlightWidth = isColorBlindMode ? 4 : 3.5;
         if (isolatedJurisdiction) {
-          return d.jurisdiction === isolatedJurisdiction ? 3.5 : 2.5;
+          return d.jurisdiction === isolatedJurisdiction ? highlightWidth : baseWidth;
         }
         if (hoveredJurisdiction) {
-          return d.jurisdiction === hoveredJurisdiction ? 3.5 : 2.5;
+          return d.jurisdiction === hoveredJurisdiction ? highlightWidth : baseWidth;
         }
-        return 2.5;
+        return baseWidth;
       });
     
     // Add hover and click handlers to lines
@@ -318,14 +424,18 @@ loadQ1Data().then(data => {
         updateLineStyles();
         updateLegendStyles();
         updateDotsVisibility();
+        if (window.rq1UpdateMinMaxBubbles) {
+          window.rq1UpdateMinMaxBubbles();
+        }
       });
     
     // Update dots
     const dots = dotsGroup.selectAll('.dot-group')
       .data(dataByJurisdiction, d => d.jurisdiction);
     
-    // Exit
+    // Exit - interrupt any existing transitions first
     dots.exit()
+      .interrupt()
       .transition()
       .duration(500)
       .style('opacity', 0)
@@ -340,7 +450,9 @@ loadQ1Data().then(data => {
     // Update + Enter
     const dotsUpdate = dotsEnter.merge(dots);
     
-    dotsUpdate.transition()
+    dotsUpdate
+      .interrupt()
+      .transition()
       .duration(500)
       .style('opacity', 1);
     
@@ -348,22 +460,31 @@ loadQ1Data().then(data => {
     const circles = dotsUpdate.selectAll('circle')
       .data(d => d.values.map(v => ({ ...v, jurisdiction: d.jurisdiction })), d => `${d.jurisdiction}-${d.Month}`);
     
-    circles.exit().remove();
+    circles.exit()
+      .interrupt()
+      .remove();
     
     const circlesEnter = circles.enter()
       .append('circle')
-      .attr('r', 4)
-      .attr('fill', d => colorScale(d.jurisdiction))
+      .attr('r', isColorBlindMode ? 5 : 4)
+      .attr('fill', d => getCurrentColorScale()(d.jurisdiction))
       .style('cursor', 'pointer')
+      .style('stroke', isColorBlindMode ? '#000' : 'none')
+      .style('stroke-width', isColorBlindMode ? 1 : 0)
       .style('opacity', 0);
     
     const allCircles = circlesEnter.merge(circles);
     
     allCircles
+      .interrupt()
       .transition()
       .duration(500)
       .attr('cx', d => xScale(d.Month))
       .attr('cy', d => yScale(d.Sum_FINES))
+      .attr('r', isColorBlindMode ? 5 : 4)
+      .attr('fill', d => getCurrentColorScale()(d.jurisdiction))
+      .style('stroke', isColorBlindMode ? '#000' : 'none')
+      .style('stroke-width', isColorBlindMode ? 1 : 0)
       .style('opacity', d => {
         if (isolatedJurisdiction) {
           return d.jurisdiction === isolatedJurisdiction ? 1 : 0.1;
@@ -373,6 +494,250 @@ loadQ1Data().then(data => {
         }
         return 1;
       });
+    
+    // Store reference for later updates
+    window.rq1AllCircles = allCircles;
+    
+    // Function to show/hide min/max bubbles
+    function updateMinMaxBubbles() {
+      // Remove existing bubbles and lines
+      g.selectAll('.minmax-bubble').remove();
+      g.selectAll('.minmax-lines').remove();
+      g.selectAll('.minmax-axis-label').remove();
+      
+      // Reset axis tick highlights
+      xAxis.selectAll('.tick text')
+        .style('fill', null)
+        .style('font-weight', null)
+        .style('font-size', null);
+      
+      yAxis.selectAll('.tick text')
+        .style('fill', null)
+        .style('font-weight', null)
+        .style('font-size', null);
+      
+      if (!isolatedJurisdiction) return;
+      
+      // Calculate min/max for the isolated jurisdiction
+      const isolatedJurData = dataByJurisdictionMap[isolatedJurisdiction] || [];
+      const isolatedValues = isolatedJurData.map(item => item.Sum_FINES).filter(v => v != null);
+      if (isolatedValues.length === 0) return;
+      
+      const minVal = Math.min(...isolatedValues);
+      const maxVal = Math.max(...isolatedValues);
+      
+      // Find the data points for min and max
+      const minMaxPoints = isolatedJurData.filter(d => d.Sum_FINES === minVal || d.Sum_FINES === maxVal);
+      
+      // First pass: draw all lines and axis labels
+      minMaxPoints.forEach(d => {
+        const label = d.Sum_FINES === maxVal ? 'MAX' : 'MIN';
+        const bgColor = d.Sum_FINES === maxVal ? '#10b981' : '#ef4444';
+        
+        const cx = xScale(d.Month);
+        const cy = yScale(d.Sum_FINES);
+        
+        // Create lines group
+        const linesGroup = g.insert('g', '.minmax-bubble')
+          .attr('class', 'minmax-lines')
+          .style('opacity', 0)
+          .style('pointer-events', 'none');
+        
+        // Vertical line to X-axis
+        linesGroup.append('line')
+          .attr('x1', cx)
+          .attr('y1', cy)
+          .attr('x2', cx)
+          .attr('y2', height)
+          .attr('stroke', bgColor)
+          .attr('stroke-width', 1.5)
+          .attr('stroke-dasharray', '4,4')
+          .attr('opacity', 0.8);
+        
+        // Horizontal line to Y-axis
+        linesGroup.append('line')
+          .attr('x1', cx)
+          .attr('y1', cy)
+          .attr('x2', 0)
+          .attr('y2', cy)
+          .attr('stroke', bgColor)
+          .attr('stroke-width', 1.5)
+          .attr('stroke-dasharray', '4,4')
+          .attr('opacity', 0.8);
+        
+        // Highlight X-axis tick if it matches
+        const xTicks = xScale.ticks();
+        const isXOnTick = xTicks.some(tick => Math.abs(tick - d.Month) < 0.5);
+        
+        if (isXOnTick) {
+          xAxis.selectAll('.tick text')
+            .filter(function(t) { return Math.abs(t - d.Month) < 0.5; })
+            .style('fill', bgColor)
+            .style('font-weight', '700')
+            .style('font-size', '13px');
+        } else {
+          // Add custom X-axis label
+          const xLabelGroup = g.append('g')
+            .attr('class', 'minmax-axis-label')
+            .style('opacity', 0);
+          
+          const xMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const xLabelText = xMonths[d.Month - 1];
+          
+          const xLabel = xLabelGroup.append('text')
+            .attr('x', cx)
+            .attr('y', height + 20)
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '11px')
+            .attr('font-weight', '700')
+            .attr('fill', bgColor)
+            .text(xLabelText);
+          
+          const xLabelBBox = xLabel.node().getBBox();
+          xLabelGroup.insert('rect', 'text')
+            .attr('x', xLabelBBox.x - 4)
+            .attr('y', xLabelBBox.y - 2)
+            .attr('width', xLabelBBox.width + 8)
+            .attr('height', xLabelBBox.height + 4)
+            .attr('fill', 'white')
+            .attr('opacity', 0.9)
+            .attr('rx', 3);
+          
+          xLabelGroup.transition().duration(300).style('opacity', 1);
+        }
+        
+        // Store Y-axis label info for positioning
+        d.yLabelInfo = {
+          value: d.Sum_FINES,
+          cy: cy,
+          bgColor: bgColor,
+          label: label
+        };
+        
+        // Animate lines in
+        linesGroup.transition().duration(300).style('opacity', 1);
+      });
+      
+      // Position Y-axis labels with smart spacing to avoid overlap
+      const yLabelsToPlace = minMaxPoints.map(d => d.yLabelInfo).sort((a, b) => b.cy - a.cy);
+      const minSpacing = 25; // Minimum pixels between labels
+      
+      yLabelsToPlace.forEach((labelInfo, idx) => {
+        // Calculate position avoiding overlap
+        let targetY = labelInfo.cy;
+        
+        // Check previous label for overlap
+        if (idx > 0) {
+          const prevLabel = yLabelsToPlace[idx - 1];
+          const prevY = prevLabel.adjustedY || prevLabel.cy;
+          if (Math.abs(targetY - prevY) < minSpacing) {
+            targetY = prevY - minSpacing;
+          }
+        }
+        
+        labelInfo.adjustedY = targetY;
+        
+        // Check if adjusted Y matches a tick
+        const yTicks = yScale.ticks();
+        const isYOnTick = yTicks.some(tick => Math.abs(tick - labelInfo.value) < (labelInfo.value * 0.02));
+        
+        if (isYOnTick) {
+          yAxis.selectAll('.tick text')
+            .filter(function(t) { return Math.abs(t - labelInfo.value) < (labelInfo.value * 0.02); })
+            .style('fill', labelInfo.bgColor)
+            .style('font-weight', '700')
+            .style('font-size', '13px');
+        } else {
+          // Add custom Y-axis label group
+          const yLabelGroup = g.append('g')
+            .attr('class', 'minmax-axis-label')
+            .style('opacity', 0);
+          
+          // Draw connecting line from label to actual data point if positions differ
+          if (Math.abs(targetY - labelInfo.cy) > 2) {
+            yLabelGroup.append('line')
+              .attr('x1', -8)
+              .attr('y1', targetY)
+              .attr('x2', 0)
+              .attr('y2', labelInfo.cy)
+              .attr('stroke', labelInfo.bgColor)
+              .attr('stroke-width', 1)
+              .attr('opacity', 0.5);
+          }
+          
+          const yLabel = yLabelGroup.append('text')
+            .attr('x', -10)
+            .attr('y', targetY + 4)
+            .attr('text-anchor', 'end')
+            .attr('font-size', '11px')
+            .attr('font-weight', '700')
+            .attr('fill', labelInfo.bgColor)
+            .text(d3.format('.2s')(labelInfo.value));
+          
+          const yLabelBBox = yLabel.node().getBBox();
+          yLabelGroup.insert('rect', 'text')
+            .attr('x', yLabelBBox.x - 4)
+            .attr('y', yLabelBBox.y - 2)
+            .attr('width', yLabelBBox.width + 8)
+            .attr('height', yLabelBBox.height + 4)
+            .attr('fill', 'white')
+            .attr('opacity', 0.9)
+            .attr('rx', 3);
+          
+          yLabelGroup.transition().duration(300).style('opacity', 1);
+        }
+      });
+      
+      // Second pass: draw all chat bubbles on top
+      minMaxPoints.forEach(d => {
+        const label = d.Sum_FINES === maxVal ? 'MAX' : 'MIN';
+        const bgColor = d.Sum_FINES === maxVal ? '#10b981' : '#ef4444';
+        
+        const cx = xScale(d.Month);
+        const cy = yScale(d.Sum_FINES);
+        
+        // Chat bubble
+        const bubbleGroup = g.append('g')
+          .attr('class', 'minmax-bubble')
+          .attr('transform', `translate(${cx}, ${cy - 30})`)
+          .style('pointer-events', 'all');
+        
+        // Chat bubble background
+        bubbleGroup.append('rect')
+          .attr('x', -25)
+          .attr('y', -18)
+          .attr('width', 50)
+          .attr('height', 24)
+          .attr('rx', 5)
+          .attr('fill', bgColor)
+          .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))');
+        
+        // Chat bubble pointer
+        bubbleGroup.append('path')
+          .attr('d', 'M -4,6 L 0,12 L 4,6 Z')
+          .attr('fill', bgColor);
+        
+        // Label text
+        bubbleGroup.append('text')
+          .attr('x', 0)
+          .attr('y', -4)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '10px')
+          .attr('font-weight', '700')
+          .attr('fill', 'white')
+          .text(label);
+        
+        // Animate in
+        bubbleGroup
+          .style('opacity', 0)
+          .transition()
+          .duration(300)
+          .style('opacity', 1);
+      });
+    }
+    
+    // Store function reference
+    window.rq1UpdateMinMaxBubbles = updateMinMaxBubbles;
     
     // Store reference for later updates
     window.rq1AllCircles = allCircles;
@@ -387,13 +752,12 @@ loadQ1Data().then(data => {
     // Enter
     const legendEnter = legendItems.enter()
       .append('g')
-      .attr('class', 'legend-item')
-      .attr('transform', (d, i) => `translate(0, ${i * 22})`);
+      .attr('class', 'legend-item');
     
     legendEnter.append('rect')
       .attr('width', 16)
       .attr('height', 16)
-      .attr('fill', d => colorScale(d))
+      .attr('fill', d => getCurrentColorScale()(d))
       .attr('rx', 2);
     
     legendEnter.append('text')
@@ -406,10 +770,21 @@ loadQ1Data().then(data => {
     // Update positions and add interactivity
     const allLegendItems = legendEnter.merge(legendItems);
     
+    // Calculate vertical centering
+    const itemHeight = 22; // Height per item
+    const totalHeight = selected.length * itemHeight;
+    const startY = (height - totalHeight) / 2;
+    
     allLegendItems
       .transition()
       .duration(500)
-      .attr('transform', (d, i) => `translate(0, ${i * 22})`);
+      .attr('transform', (d, i) => `translate(0, ${startY + i * itemHeight})`);
+    
+    // Update legend rect colors
+    allLegendItems.select('rect')
+      .transition()
+      .duration(500)
+      .attr('fill', d => getCurrentColorScale()(d));
     
     // Add hover and click handlers to legend
     allLegendItems
@@ -437,6 +812,9 @@ loadQ1Data().then(data => {
         updateLineStyles();
         updateLegendStyles();
         updateDotsVisibility();
+        if (window.rq1UpdateMinMaxBubbles) {
+          window.rq1UpdateMinMaxBubbles();
+        }
       });
     
     // Store reference for later updates
@@ -461,8 +839,22 @@ loadQ1Data().then(data => {
         // Build tooltip content
         let tooltipHtml = `<div style="font-weight: 600; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #ddd;">${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1]} 2024</div>`;
         
-        // Get data for this month for all selected jurisdictions
-        const monthData = selected.map(jurisdiction => {
+        // If a jurisdiction is isolated, only show that one
+        const jurisdictionsToShow = isolatedJurisdiction ? [isolatedJurisdiction] : selected;
+        
+        // Calculate min/max for isolated jurisdiction if applicable
+        let minValue = null, maxValue = null;
+        if (isolatedJurisdiction) {
+          const isolatedData = dataByJurisdictionMap[isolatedJurisdiction] || [];
+          const values = isolatedData.map(d => d.Sum_FINES).filter(v => v != null);
+          if (values.length > 0) {
+            minValue = Math.min(...values);
+            maxValue = Math.max(...values);
+          }
+        }
+        
+        // Get data for this month for the jurisdictions to show
+        const monthData = jurisdictionsToShow.map(jurisdiction => {
           const jurData = dataByJurisdictionMap[jurisdiction] || [];
           const monthEntry = jurData.find(d => d.Month === month);
           return {
@@ -474,7 +866,7 @@ loadQ1Data().then(data => {
         
         monthData.forEach(d => {
           tooltipHtml += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
-            <div style="width: 12px; height: 12px; background: ${colorScale(d.jurisdiction)}; border-radius: 2px;"></div>
+            <div style="width: 12px; height: 12px; background: ${getCurrentColorScale()(d.jurisdiction)}; border-radius: 2px;"></div>
             <span style="flex: 1; font-weight: 500;">${d.jurisdiction}</span>
             <span style="font-weight: 600;">${d.value.toLocaleString()}</span>
           </div>`;
@@ -508,8 +900,22 @@ loadQ1Data().then(data => {
         // Build tooltip content
         let tooltipHtml = `<div style="font-weight: 600; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #ddd;">${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1]} 2024</div>`;
         
-        // Get data for this month for all selected jurisdictions
-        const monthData = selected.map(jurisdiction => {
+        // If a jurisdiction is isolated, only show that one (applies to touch events too)
+        const jurisdictionsToShow = isolatedJurisdiction ? [isolatedJurisdiction] : selected;
+        
+        // Calculate min/max for isolated jurisdiction if applicable (for touch events)
+        let minValueTouch = null, maxValueTouch = null;
+        if (isolatedJurisdiction) {
+          const isolatedDataTouch = dataByJurisdictionMap[isolatedJurisdiction] || [];
+          const valuesTouch = isolatedDataTouch.map(d => d.Sum_FINES).filter(v => v != null);
+          if (valuesTouch.length > 0) {
+            minValueTouch = Math.min(...valuesTouch);
+            maxValueTouch = Math.max(...valuesTouch);
+          }
+        }
+        
+        // Get data for this month for the jurisdictions to show
+        const monthData = jurisdictionsToShow.map(jurisdiction => {
           const jurData = dataByJurisdictionMap[jurisdiction] || [];
           const monthEntry = jurData.find(d => d.Month === month);
           return {
@@ -521,7 +927,7 @@ loadQ1Data().then(data => {
         
         monthData.forEach(d => {
           tooltipHtml += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
-            <div style="width: 12px; height: 12px; background: ${colorScale(d.jurisdiction)}; border-radius: 2px;"></div>
+            <div style="width: 12px; height: 12px; background: ${getCurrentColorScale()(d.jurisdiction)}; border-radius: 2px;"></div>
             <span style="flex: 1; font-weight: 500;">${d.jurisdiction}</span>
             <span style="font-weight: 600;">${d.value.toLocaleString()}</span>
           </div>`;
@@ -536,6 +942,11 @@ loadQ1Data().then(data => {
     
     // Store references for later updates
     window.rq1AllLines = linesGroup.selectAll('.line');
+    
+    // Update MIN/MAX bubbles if a jurisdiction is isolated
+    if (window.rq1UpdateMinMaxBubbles) {
+      window.rq1UpdateMinMaxBubbles();
+    }
   }
   
   // Helper function to update line styles
@@ -609,7 +1020,7 @@ loadQ1Data().then(data => {
     }
   }
   
-  // Click anywhere to clear isolation
+  // Click anywhere to clear isolation and bubbles
   svg.on('click', function(event) {
     if (event.target === this || event.target.classList.contains('overlay')) {
       if (isolatedJurisdiction) {
@@ -617,6 +1028,9 @@ loadQ1Data().then(data => {
         updateLineStyles();
         updateLegendStyles();
         updateDotsVisibility();
+        if (window.rq1UpdateMinMaxBubbles) {
+          window.rq1UpdateMinMaxBubbles();
+        }
       }
     }
   });
@@ -671,7 +1085,7 @@ loadQ1Data().then(data => {
         overlay.attr('width', newWidth);
         
         // Update legend position
-        legend.attr('transform', `translate(${newWidth + margin.left + 10}, ${margin.top})`);
+        legend.attr('transform', `translate(${newWidth + margin.left + 20}, ${margin.top})`);
         
         // Update axis label position
         svg.select('.axis-label').filter(function() {

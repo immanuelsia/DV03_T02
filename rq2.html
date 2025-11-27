@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RQ2: Seasonal Patterns | Speeding Enforcement Insights Dashboard</title>
+    <title>RQ2: The Automation Paradox | Speeding Enforcement Insights Dashboard</title>
     <link rel="stylesheet" href="css/styles-base.css">
     <link rel="stylesheet" href="css/styles-questions.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    
     <!-- D3.js -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -26,9 +23,9 @@
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="rq1.html" class="nav-link">Detection Methods</a></li>
-                <li><a href="rq2.html" class="nav-link active">Seasonal Patterns</a></li>
-                <li><a href="rq3.html" class="nav-link">Jurisdiction Analysis</a></li>
+                <li><a href="rq1.html" class="nav-link">Monthly Trends</a></li>
+                <li><a href="rq2.html" class="nav-link active">Automation Paradox</a></li>
+                <li><a href="rq3.html" class="nav-link">Geographic Distribution</a></li>
                 <li><a href="rq4.html" class="nav-link">Location Hotspots</a></li>
                 <li><a href="rq5.html" class="nav-link">Age Demographics</a></li>
             </ul>
@@ -41,9 +38,10 @@
             <div class="breadcrumb">
                 <a href="index.html">Home</a> / <span>Research Question 2</span>
             </div>
-            <h1 class="page-title">Seasonal Patterns</h1>
+            <h1 class="page-title">The Automation Paradox</h1>
             <p class="page-description">
-                Exploring monthly and yearly trends to identify seasonal patterns in traffic infractions.
+                Does increasing reliance on automated enforcement lead to a drop in serious legal charges?
+                <br><span style="font-size: 0.9em; color: #666; font-weight: 600; font-style: italic;">Data Period: 2020-2024 (5 years)</span>
             </p>
         </div>
     </section>
@@ -51,38 +49,48 @@
     <!-- Main Content -->
     <section class="section section-light">
         <div class="container">
-            <div class="viz-controls">
-                <label class="control-label">
-                    <span>Visualization Type:</span>
-                    <select id="rq2-view" class="control-select">
-                        <option value="heatmap">Heatmap</option>
-                        <option value="line">Line Chart</option>
-                    </select>
-                </label>
+            <div class="viz-card">
+                <h2>Interactive Bubble Chart</h2>
+                <p style="margin-bottom: 1.5rem; color: #666;">Explore the relationship between automation levels and enforcement severity across Australian jurisdictions.</p>
+                
+                <div id="rq2-controls"></div>
+                <div id="rq2-chart"></div>
             </div>
 
-            <div id="rq2-heatmap" class="heatmap-container">
-                <div id="rq2-heatmap-viz"></div>
-            </div>
-
-            <div id="rq2-line" class="chart-container" style="display: none;">
-                <canvas id="rq2-line-chart"></canvas>
+            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
+                <h4 style="margin: 0 0 10px 0; color: #111827;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 8h.01"></path>
+                    </svg>
+                    How to Use This Visualization
+                </h4>
+                <ul style="margin: 0; padding-left: 20px; color: #4b5563; line-height: 1.8;">
+                    <li><strong>Bubble Position:</strong> X-axis shows automation percentage, Y-axis shows serious charges per 10,000 fines</li>
+                    <li><strong>Bubble Size:</strong> Larger bubbles represent higher total fine volumes for that jurisdiction</li>
+                    <li><strong>Bubble Color:</strong> Each jurisdiction has a unique color for easy identification</li>
+                    <li><strong>Background Zones:</strong> Red "High Intervention Zone" (top-left) vs blue "Machine Zone" (bottom-right)</li>
+                    <li><strong>Hover:</strong> Move your mouse over bubbles to see dashed lines to axes with exact automation and severity values</li>
+                    <li><strong>Click to Focus:</strong> Click any bubble to lock the view and dim others for detailed comparison</li>
+                </ul>
             </div>
 
             <div class="insights">
                 <div class="insight-card">
-                    <h4>Peak Season</h4>
-                    <p>December and January show <strong>35% higher</strong> infraction rates, 
-                    likely due to holiday travel and tourist activity.</p>
+                    <h4>High Automation States</h4>
+                    <p>NSW and VIC lead with <strong>88-92% automation</strong>, processing over 400,000 fines annually through 
+                    camera systems with minimal serious charge escalation.</p>
                 </div>
                 <div class="insight-card">
-                    <h4>Lowest Period</h4>
-                    <p>May through July consistently show the lowest infraction rates across all years analyzed.</p>
+                    <h4>Police-Heavy Enforcement</h4>
+                    <p>TAS and NT maintain <strong>45-48% automation</strong>, resulting in 28-30 serious charges per 10,000 fines—
+                    nearly 6x higher than automated states.</p>
                 </div>
                 <div class="insight-card">
-                    <h4>Year-over-Year</h4>
-                    <p>Overall infraction rates have shown a <strong>steady increase</strong> of approximately 
-                    3-5% annually from 2019 to 2024.</p>
+                    <h4>The Trade-Off</h4>
+                    <p>Jurisdictions face a clear choice: high-volume/low-severity automated enforcement or 
+                    <strong>low-volume/high-severity</strong> police-led intervention.</p>
                 </div>
             </div>
         </div>
@@ -91,7 +99,7 @@
     <!-- Analysis Section -->
     <section class="section section-dark">
         <div class="container">
-            <h2 class="section-title">Temporal Analysis</h2>
+            <h2 class="section-title">Enforcement Strategy Analysis</h2>
             
             <div class="analysis-grid">
                 <div class="analysis-card">
@@ -100,17 +108,17 @@
                             <circle cx="12" cy="12" r="10"></circle>
                             <path d="M12 6v6l4 2"></path>
                         </svg>
-                        Holiday Period Impact
+                        Machine Zone Characteristics
                     </h3>
                     <p>
-                        The December-January period consistently shows the highest infraction rates across all 
-                        years analyzed. This spike correlates with increased travel during summer holidays in 
-                        Australia, higher tourist numbers, and changes in regular traffic patterns.
+                        Jurisdictions with 70%+ automation operate in the "Machine Zone"—characterized by 
+                        high-volume camera enforcement with standardized penalties. These states issue massive 
+                        fine volumes but rarely escalate to court proceedings or serious charges.
                     </p>
                     <ul>
-                        <li>December average: 4,550 infractions</li>
-                        <li>January average: 4,250 infractions</li>
-                        <li>35% above yearly average</li>
+                        <li>NSW: 92% automated, 5 charges per 10k fines</li>
+                        <li>VIC: 88% automated, 8 charges per 10k fines</li>
+                        <li>Combined volume: 400,000+ fines annually</li>
                     </ul>
                 </div>
 
@@ -120,17 +128,17 @@
                             <path d="M10.5 20.5 3 13l7.5-7.5L14 9l6-6"></path>
                             <path d="M15 15v5h5"></path>
                         </svg>
-                        Winter Trough
+                        High Intervention Zone
                     </h3>
                     <p>
-                        The months of May, June, and July represent the lowest infraction period. Reduced travel 
-                        during colder months, fewer tourists, and more consistent commuting patterns likely 
-                        contribute to this decline.
+                        Jurisdictions with under 55% automation operate in the "High Intervention Zone"—
+                        relying heavily on police stops and roadside enforcement. This approach results in 
+                        significantly higher rates of serious charges and court appearances per fine issued.
                     </p>
                     <ul>
-                        <li>June average: 2,825 infractions</li>
-                        <li>July average: 2,700 infractions</li>
-                        <li>20% below yearly average</li>
+                        <li>TAS: 45% automated, 28 charges per 10k fines</li>
+                        <li>NT: 48% automated, 30 charges per 10k fines</li>
+                        <li>5-6x higher severity than automated states</li>
                     </ul>
                 </div>
 
@@ -140,17 +148,17 @@
                             <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                             <polyline points="17 6 23 6 23 12"></polyline>
                         </svg>
-                        Growth Trends
+                        Volume vs Severity Trade-off
                     </h3>
                     <p>
-                        Every month shows growth when comparing 2019 to 2024, with the most significant increases 
-                        occurring in the peak season months. This suggests that seasonal factors are becoming 
-                        more pronounced over time.
+                        The data reveals an inverse relationship: as automation increases, total fine volume 
+                        rises dramatically while serious charge rates plummet. This suggests automated systems 
+                        catch more minor violations but lack the discretionary escalation of police enforcement.
                     </p>
                     <ul>
-                        <li>Average annual growth: 3-5%</li>
-                        <li>Peak month growth: 7-9%</li>
-                        <li>Off-peak growth: 2-4%</li>
+                        <li>Correlation coefficient: -0.89 (strong negative)</li>
+                        <li>10% automation increase = ~3 fewer charges per 10k</li>
+                        <li>Volume increase: +50-100k fines per 10% automation</li>
                     </ul>
                 </div>
 
@@ -162,17 +170,17 @@
                             <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
                             <path d="M16 16h5v5"></path>
                         </svg>
-                        Seasonal Consistency
+                        Policy Implications
                     </h3>
                     <p>
-                        The seasonal pattern is remarkably consistent across all years, indicating stable 
-                        behavioral patterns. This consistency enables predictive modeling for resource allocation 
-                        and enforcement planning.
+                        The paradox reveals competing priorities: automated enforcement maximizes revenue and 
+                        compliance monitoring but may reduce deterrence of serious violations. Police-led 
+                        enforcement catches fewer violations but identifies and escalates dangerous driving behavior.
                     </p>
                     <ul>
-                        <li>Pattern correlation: >0.95 across years</li>
-                        <li>Peak timing: Consistent within 1 month</li>
-                        <li>Amplitude variation: <15% year-to-year</li>
+                        <li>Revenue focus: Favor automation (more fines)</li>
+                        <li>Safety focus: Favor police intervention (serious charges)</li>
+                        <li>Middle states (QLD, WA, SA) balance both approaches</li>
                     </ul>
                 </div>
             </div>
@@ -183,8 +191,8 @@
     <section class="section section-light">
         <div class="container">
             <div class="page-navigation">
-                <a href="rq1.html" class="nav-btn nav-btn-secondary">← Previous: Detection Methods</a>
-                <a href="rq3.html" class="nav-btn nav-btn-primary">Next: Jurisdiction Analysis →</a>
+                <a href="rq1.html" class="nav-btn nav-btn-secondary">← Previous: Monthly Trends by Jurisdiction</a>
+                <a href="rq3.html" class="nav-btn nav-btn-primary">Next: Geographic Distribution →</a>
             </div>
         </div>
     </section>
@@ -209,9 +217,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="data.js"></script>
-    <script src="js/rq2.js"></script>
-    <script src="main.js"></script>
+    <script src="js/rq2.js?v=5"></script>
 </body>
 </html>
 
