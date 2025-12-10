@@ -117,6 +117,38 @@ function initRQ5() {
   jurisSelect.addEventListener('change', () => {
     renderVisualization();
   });
+  
+  // Age group filter
+  const ageFilter = document.getElementById('rq5-age-filter');
+  if (ageFilter) {
+    ageFilter.addEventListener('change', () => {
+      renderVisualization();
+    });
+  }
+  
+  // Reset filters button
+  const resetBtn = document.getElementById('rq5-reset-filters');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      yearSelect.value = '2024';
+      jurisSelect.value = 'all';
+      if (ageFilter) ageFilter.value = 'all';
+      
+      // Reset to bubble view
+      currentView = 'bubble';
+      document.querySelectorAll('.view-icon-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('view-bubble').classList.add('active');
+      yearSelect.disabled = false;
+      yearSelect.style.opacity = '1';
+      yearSelect.style.cursor = 'pointer';
+      
+      // Reset colorblind mode
+      isColorblind = false;
+      document.getElementById('colorblind-toggle').classList.remove('active');
+      
+      renderVisualization();
+    });
+  }
 }
 
 function getColors() {
@@ -126,6 +158,8 @@ function getColors() {
 function filterData() {
   const year = document.getElementById('rq5-year').value;
   const jurisdiction = document.getElementById('rq5-jurisdiction').value;
+  const ageFilter = document.getElementById('rq5-age-filter');
+  const ageGroup = ageFilter ? ageFilter.value : 'all';
   
   let filtered = rq5Data;
   
@@ -135,6 +169,17 @@ function filterData() {
   
   if (jurisdiction !== 'all') {
     filtered = filtered.filter(d => d.jurisdiction === jurisdiction);
+  }
+  
+  // Filter by age group category
+  if (ageGroup !== 'all') {
+    const ageGroupMap = {
+      'young': ['Underage', '17-25'],
+      'adult': ['26-39', '40-64'],
+      'senior': ['65+']
+    };
+    const targetGroups = ageGroupMap[ageGroup] || [];
+    filtered = filtered.filter(d => targetGroups.includes(d.ageGroup));
   }
   
   return filtered;
@@ -660,6 +705,117 @@ function renderBarChart() {
       .text(ag);
   });
 }
+
+// ===== DATA TABLE FUNCTIONALITY =====
+function populateDataTable() {
+  const tableBody = d3.select('#rq5-summary-table tbody');
+  if (tableBody.empty()) return;
+  
+  const data = filterData();
+  const aggregated = aggregateByAgeGroup(data);
+  
+  if (aggregated.length === 0) {
+    tableBody.html('<tr><td colspan="5" style="text-align: center; color: #6b7280; padding: 20px;">No data available for selected filters</td></tr>');
+    return;
+  }
+  
+  const colors = getColors();
+  
+  // Calculate risk levels
+  const maxRate = d3.max(aggregated, d => d.ratePerTenK);
+  const minRate = d3.min(aggregated, d => d.ratePerTenK);
+  const rateRange = maxRate - minRate;
+  
+  function getRiskLevel(rate) {
+    const normalized = (rate - minRate) / rateRange;
+    if (normalized > 0.75) return { label: 'High', class: 'trend-up', color: '#ef4444' };
+    if (normalized > 0.4) return { label: 'Medium', class: '', color: '#f59e0b' };
+    return { label: 'Low', class: 'trend-down', color: '#10b981' };
+  }
+  
+  // Sort by rate (descending) initially
+  aggregated.sort((a, b) => b.ratePerTenK - a.ratePerTenK);
+  
+  // Clear and populate table
+  tableBody.html('');
+  
+  aggregated.forEach(stat => {
+    const risk = getRiskLevel(stat.ratePerTenK);
+    
+    const row = tableBody.append('tr');
+    
+    row.append('td')
+      .html(`<div class="jurisdiction-cell">
+        <span class="color-indicator" style="background: ${colors[stat.ageGroup]}"></span>
+        <span>${stat.ageGroup}</span>
+      </div>`);
+    
+    row.append('td')
+      .style('font-weight', '600')
+      .text(stat.ratePerTenK.toFixed(1));
+    
+    row.append('td').text(stat.totalFines.toLocaleString());
+    row.append('td').text(Math.round(stat.totalLicenceHolders).toLocaleString());
+    
+    row.append('td')
+      .html(`<span style="color: ${risk.color}; font-weight: 600;">${risk.label}</span>`);
+  });
+  
+  // Add sorting functionality
+  d3.selectAll('#rq5-summary-table th[data-sort]').on('click', function() {
+    const sortKey = d3.select(this).attr('data-sort');
+    const currentDir = d3.select(this).classed('sorted-asc') ? 'asc' : 
+                      (d3.select(this).classed('sorted-desc') ? 'desc' : 'none');
+    
+    // Reset all headers
+    d3.selectAll('#rq5-summary-table th').classed('sorted-asc', false).classed('sorted-desc', false);
+    
+    // Determine new direction
+    const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+    d3.select(this).classed(`sorted-${newDir}`, true);
+    
+    // Sort data
+    aggregated.sort((a, b) => {
+      let aVal = a[sortKey];
+      let bVal = b[sortKey];
+      if (typeof aVal === 'string') {
+        return newDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+      return newDir === 'asc' ? aVal - bVal : bVal - aVal;
+    });
+    
+    // Re-render table
+    tableBody.html('');
+    aggregated.forEach(stat => {
+      const risk = getRiskLevel(stat.ratePerTenK);
+      
+      const row = tableBody.append('tr');
+      
+      row.append('td')
+        .html(`<div class="jurisdiction-cell">
+          <span class="color-indicator" style="background: ${colors[stat.ageGroup]}"></span>
+          <span>${stat.ageGroup}</span>
+        </div>`);
+      
+      row.append('td')
+        .style('font-weight', '600')
+        .text(stat.ratePerTenK.toFixed(1));
+      
+      row.append('td').text(stat.totalFines.toLocaleString());
+      row.append('td').text(Math.round(stat.totalLicenceHolders).toLocaleString());
+      
+      row.append('td')
+        .html(`<span style="color: ${risk.color}; font-weight: 600;">${risk.label}</span>`);
+    });
+  });
+}
+
+// Update table when filters change
+const originalRenderViz = renderVisualization;
+renderVisualization = function() {
+  originalRenderViz();
+  populateDataTable();
+};
 
 // Initialize on page load
 if (document.readyState === 'loading') {

@@ -49,38 +49,77 @@
     <!-- Main Content -->
     <section class="section section-light">
         <div class="container">
-            <section class="map-card" id="card-rq3">
-                <h2 style="margin:12px 18px 0">Jurisdiction Analysis Map</h2>
-                <div class="map-inner">
-                    <svg id="rq3-map" role="img" aria-label="RQ3 Map"></svg>
-                    <div class="controls">
-                        <button id="zoomIn-rq3" title="Zoom In">+</button>
-                        <button id="zoomOut-rq3" title="Zoom Out">−</button>
-                        <button id="reset-rq3" title="Reset View">⌂</button>
-                    </div>
-                </div>
-                <div class="year-control" style="padding:12px 18px;display:flex;align-items:center;gap:12px;">
-                    <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
-                        <div style="display:flex;gap:8px;align-items:center;">
-                            <div id="mode-tabs-rq3" style="display:flex;gap:6px;">
-                                <button class="mode-tab" id="mode-camera-rq3">Camera</button>
-                                <button class="mode-tab" id="mode-police-rq3">Police</button>
-                                <button class="mode-tab" id="mode-both-rq3">Both</button>
-                            </div>
-                            <div style="margin-left:auto">Year: <strong id="year-label-rq3">2024</strong></div>
+            <!-- Map and Details Side Panel Layout -->
+            <div class="map-details-layout" style="display: grid; grid-template-columns: 1fr 350px; gap: 24px; align-items: start;">
+                <section class="map-card" id="card-rq3">
+                    <h2 style="margin:12px 18px 0">Jurisdiction Analysis Map</h2>
+                    <div class="map-inner">
+                        <svg id="rq3-map" role="img" aria-label="RQ3 Map"></svg>
+                        <div class="controls">
+                            <button id="zoomIn-rq3" title="Zoom In">+</button>
+                            <button id="zoomOut-rq3" title="Zoom Out">−</button>
+                            <button id="reset-rq3" title="Reset View">⌂</button>
                         </div>
-                        <input id="year-slider-rq3" type="range" min="2018" max="2024" step="1" value="2024" style="width:100%" />
+                    </div>
+                    <div class="year-control" style="padding:12px 18px;display:flex;align-items:center;gap:12px;">
+                        <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <div id="mode-tabs-rq3" style="display:flex;gap:6px;">
+                                    <button class="mode-tab" id="mode-camera-rq3">Camera</button>
+                                    <button class="mode-tab" id="mode-police-rq3">Police</button>
+                                    <button class="mode-tab" id="mode-both-rq3">Both</button>
+                                </div>
+                                <div style="margin-left:auto">Year: <strong id="year-label-rq3">2024</strong></div>
+                            </div>
+                            <input id="year-slider-rq3" type="range" min="2018" max="2024" step="1" value="2024" style="width:100%" />
+                        </div>
+                    </div>
+
+                    <div class="info-panel" id="infoPanel-rq3">
+                        <h3>Feature Info</h3>
+                        <div class="hint">Hover over features to see details</div>
+                    </div>
+                    <div class="loading" id="loading-rq3">Loading data...</div>
+                </section>
+
+                <!-- Police/Camera Details Side Panel -->
+                <div class="details-side-panel" id="rq3-details-panel" style="background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 20px; position: sticky; top: 90px;">
+                    <h3 style="margin: 0 0 16px 0; font-size: 1.1rem; color: #1f2937; display: flex; align-items: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        Detection Method Comparison
+                    </h3>
+                    
+                    <div id="rq3-comparison-content">
+                        <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 16px;">Select a jurisdiction on the map to view detailed camera vs police breakdown.</p>
+                        
+                        <!-- All Jurisdictions Summary -->
+                        <div class="all-jurisdictions-summary" style="margin-bottom: 20px;">
+                            <h4 style="font-size: 0.85rem; color: #374151; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">All Jurisdictions Summary (<span id="rq3-year-display">2024</span>)</h4>
+                            <div id="rq3-all-summary" style="max-height: 400px; overflow-y: auto;">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="info-panel" id="infoPanel-rq3">
-                    <h3>Feature Info</h3>
-                    <div class="hint">Hover over features to see details</div>
-                </div>
-                <div class="loading" id="loading-rq3">Loading data...</div>
-            </section>
+            <!-- Responsive style for mobile -->
+            <style>
+                @media (max-width: 1024px) {
+                    .map-details-layout {
+                        grid-template-columns: 1fr !important;
+                    }
+                    .details-side-panel {
+                        position: relative !important;
+                        top: 0 !important;
+                    }
+                }
+            </style>
 
-            <div class="insights">
+            <div class="insights" style="margin-top: 30px;">
                 <div class="insight-card">
                     <h4>Highest Rate</h4>
                     <p>Victoria shows the highest per-capita detection rate at <strong>127 infractions per 10,000 residents</strong>.</p>

@@ -1254,3 +1254,210 @@ body:has(#rq5-chart) .section {
   }
 }
 
+/* ===== DATA TABLE STYLES ===== */
+.data-table-container {
+  background: white;
+  border: 1px solid var(--beige-200);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.summary-table thead {
+  background: var(--beige-100);
+}
+
+.summary-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--beige-700);
+  border-bottom: 2px solid var(--beige-200);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.summary-table th:hover {
+  background: var(--beige-200);
+}
+
+.summary-table th.sorted-asc::after {
+  content: ' ▲';
+  font-size: 0.7em;
+}
+
+.summary-table th.sorted-desc::after {
+  content: ' ▼';
+  font-size: 0.7em;
+}
+
+.summary-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--beige-200);
+  color: var(--beige-800);
+}
+
+.summary-table tbody tr:hover {
+  background: var(--beige-50);
+}
+
+.summary-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.summary-table .trend-up {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.summary-table .trend-down {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.summary-table .trend-neutral {
+  color: #6b7280;
+}
+
+.summary-table .jurisdiction-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-table .color-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ===== SIDE PANEL STYLES ===== */
+.details-side-panel .jurisdiction-item {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: var(--beige-50);
+  border: 1px solid var(--beige-200);
+  transition: all 0.2s ease;
+}
+
+.details-side-panel .jurisdiction-item:hover {
+  background: var(--beige-100);
+  border-color: var(--beige-300);
+}
+
+.details-side-panel .jurisdiction-name {
+  font-weight: 600;
+  color: var(--beige-800);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.details-side-panel .method-bars {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.details-side-panel .camera-bar {
+  background: #3388ff;
+  transition: width 0.3s ease;
+}
+
+.details-side-panel .police-bar {
+  background: #ff5a5a;
+  transition: width 0.3s ease;
+}
+
+.details-side-panel .method-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--beige-600);
+}
+
+.details-side-panel .method-stats .camera-stat {
+  color: #3388ff;
+  font-weight: 600;
+}
+
+.details-side-panel .method-stats .police-stat {
+  color: #ff5a5a;
+  font-weight: 600;
+}
+
+/* ===== ENHANCED TOOLTIP STYLES ===== */
+.enhanced-tooltip {
+  position: fixed !important;
+  pointer-events: none;
+  padding: 14px 18px;
+  font-size: 13px;
+  background: rgba(15, 23, 42, 0.95);
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 99999 !important;
+  line-height: 1.6;
+  max-width: 320px;
+  backdrop-filter: blur(4px);
+}
+
+.enhanced-tooltip .tooltip-header {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.enhanced-tooltip .tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+  gap: 16px;
+}
+
+.enhanced-tooltip .tooltip-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.enhanced-tooltip .tooltip-value {
+  font-weight: 600;
+  color: #fff;
+}
+
+.enhanced-tooltip .tooltip-footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ===== MOBILE RESPONSIVE FOR NEW COMPONENTS ===== */
+@media (max-width: 768px) {
+  .data-table-container {
+    padding: 16px;
+  }
+  
+  .summary-table th,
+  .summary-table td {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .details-side-panel {
+    padding: 16px;
+  }
+}
+

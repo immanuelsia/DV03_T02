@@ -48,8 +48,8 @@
     <!-- Main Content -->
     <section class="section section-light">
         <div class="container">
-            <div class="viz-controls" style="justify-content: space-between; align-items: center;">
-                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
+            <div class="viz-controls" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
                     <label class="control-label">
                         <span>Year:</span>
                         <select id="rq5-year" class="control-select">
@@ -62,6 +62,18 @@
                             <option value="all">All Jurisdictions</option>
                         </select>
                     </label>
+                    <label class="control-label">
+                        <span>Age Groups:</span>
+                        <select id="rq5-age-filter" class="control-select">
+                            <option value="all">All Age Groups</option>
+                            <option value="young">Young (Under 26)</option>
+                            <option value="adult">Adults (26-64)</option>
+                            <option value="senior">Seniors (65+)</option>
+                        </select>
+                    </label>
+                    <button id="rq5-reset-filters" class="reset-btn" style="padding: 8px 16px; background: var(--beige-100); border: 1px solid var(--beige-300); border-radius: 6px; cursor: pointer; font-weight: 500; color: var(--beige-700);">
+                        Reset
+                    </button>
                 </div>
                 
                 <!-- View Toggle Icons -->
@@ -110,6 +122,35 @@
                     <li><strong>Eye Icon:</strong> Click the eye icon at the bottom-right corner to toggle colorblind-safe colors</li>
                     <li><strong>Hover:</strong> Move your mouse over elements to see detailed statistics</li>
                 </ul>
+            </div>
+
+            <!-- Data Overview Table -->
+            <div id="rq5-data-table" class="data-table-container" style="margin: 30px 0;">
+                <h3 style="margin-bottom: 15px; color: #1f2937; font-size: 1.25rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    Data Overview Table
+                </h3>
+                <p style="color: #6b7280; margin-bottom: 15px; font-size: 0.9rem;">Summary statistics by age group. Click column headers to sort.</p>
+                <div style="overflow-x: auto;">
+                    <table id="rq5-summary-table" class="summary-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="ageGroup">Age Group ↕</th>
+                                <th data-sort="ratePerTenK">Rate per 10k ↕</th>
+                                <th data-sort="totalFines">Total Fines ↕</th>
+                                <th data-sort="licenceHolders">License Holders ↕</th>
+                                <th data-sort="riskLevel">Risk Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="insights">

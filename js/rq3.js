@@ -368,6 +368,15 @@ d3.csv('data/Q3DATA.csv', d3.autoType).then(rows => {
 
   csvLoaded = true;
   tryUpdateChoropleth();
+  
+  // Update side panel after data loads
+  if (window.rq3UpdateSidePanel) {
+    window.rq3UpdateSidePanel(currentYear);
+  } else {
+    setTimeout(() => {
+      if (window.rq3UpdateSidePanel) window.rq3UpdateSidePanel(currentYear);
+    }, 100);
+  }
 
   const slider = d3.select('#year-slider-rq3');
   if(!slider.empty()){
@@ -463,5 +472,121 @@ window.addEventListener("resize", () => {
     fitToMap();
   }
 });
+
+// ===== SIDE PANEL: Police/Camera Comparison =====
+function updateSidePanel(year) {
+  const summaryContainer = d3.select('#rq3-all-summary');
+  if (summaryContainer.empty()) return;
+  
+  // Update year display
+  d3.select('#rq3-year-display').text(year);
+  
+  // Get all jurisdictions data for the year
+  const jurisdictions = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'NT', 'ACT'];
+  const jurisdictionNames = {
+    'NSW': 'New South Wales',
+    'VIC': 'Victoria',
+    'QLD': 'Queensland',
+    'WA': 'Western Australia',
+    'SA': 'South Australia',
+    'TAS': 'Tasmania',
+    'NT': 'Northern Territory',
+    'ACT': 'ACT'
+  };
+  
+  summaryContainer.html('');
+  
+  jurisdictions.forEach(code => {
+    const row = q3DataLookup[code] && q3DataLookup[code][year];
+    if (!row) return;
+    
+    const cameraVal = row.Camera_offence_per10k != null ? Number(row.Camera_offence_per10k) : 0;
+    const policeVal = row.Police_offence_per10k != null ? Number(row.Police_offence_per10k) : 0;
+    const total = cameraVal + policeVal;
+    
+    if (total === 0) return;
+    
+    const cameraPct = (cameraVal / total * 100).toFixed(1);
+    const policePct = (policeVal / total * 100).toFixed(1);
+    
+    const item = summaryContainer.append('div')
+      .attr('class', 'jurisdiction-item')
+      .style('cursor', 'pointer')
+      .on('mouseenter', function() {
+        // Highlight corresponding map region
+        g.selectAll('.feature').each(function(d) {
+          const mapCode = getJurisdictionFromProps(d.properties);
+          if (mapCode === code) {
+            d3.select(this).classed('highlighted', true).attr('fill-opacity', 0.55);
+            updateInfo(d.properties);
+          }
+        });
+      })
+      .on('mouseleave', function() {
+        g.selectAll('.feature').classed('highlighted', false).attr('fill-opacity', 0.3);
+        updateInfo(null);
+      })
+      .on('click', function() {
+        // Select the map region
+        g.selectAll('.feature').each(function(d) {
+          const mapCode = getJurisdictionFromProps(d.properties);
+          if (mapCode === code) {
+            g.selectAll('.feature').classed('selected', false);
+            d3.select(this).classed('selected', true);
+            updateInfo(d.properties);
+          }
+        });
+      });
+    
+    item.append('div')
+      .attr('class', 'jurisdiction-name')
+      .text(jurisdictionNames[code] || code);
+    
+    // Stacked bar showing camera vs police
+    const barsDiv = item.append('div')
+      .attr('class', 'method-bars');
+    
+    barsDiv.append('div')
+      .attr('class', 'camera-bar')
+      .style('width', cameraPct + '%');
+    
+    barsDiv.append('div')
+      .attr('class', 'police-bar')
+      .style('width', policePct + '%');
+    
+    // Stats row
+    const statsDiv = item.append('div')
+      .attr('class', 'method-stats');
+    
+    statsDiv.append('span')
+      .html(`<span class="camera-stat">📷 ${cameraPct}%</span> (${cameraVal.toFixed(1)}/10k)`);
+    
+    statsDiv.append('span')
+      .html(`<span class="police-stat">👮 ${policePct}%</span> (${policeVal.toFixed(1)}/10k)`);
+  });
+}
+
+// Update side panel when year changes
+const originalSliderHandler = d3.select('#year-slider-rq3').on('input');
+d3.select('#year-slider-rq3').on('input', function(event) {
+  currentYear = +event.target.value;
+  updateChoropleth(currentYear);
+  updateSidePanel(currentYear);
+  const sel = g.select('.feature.selected');
+  if (!sel.empty()) {
+    const selDatum = sel.datum();
+    if (selDatum && selDatum.properties) updateInfo(selDatum.properties);
+  }
+});
+
+// Initial panel population (delayed to wait for data)
+setTimeout(() => {
+  if (csvLoaded) {
+    updateSidePanel(currentYear);
+  }
+}, 500);
+
+// Expose function for use after CSV loads
+window.rq3UpdateSidePanel = updateSidePanel;
 
 })();

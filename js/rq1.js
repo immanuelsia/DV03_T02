@@ -255,18 +255,19 @@ loadQ1Data().then(data => {
     }
   });
   
-  // Create tooltip
+  // Create enhanced tooltip with better styling
   const tooltip = d3.select('body').append('div')
-    .attr('class', 'rq1-tooltip')
-    .style('position', 'absolute')
+    .attr('class', 'rq1-tooltip enhanced-tooltip')
+    .style('position', 'fixed')
     .style('pointer-events', 'none')
-    .style('padding', '10px 12px')
-    .style('font-size', '12px')
-    .style('background', 'rgba(255, 255, 255, 0.95)')
-    .style('color', '#333')
-    .style('border', '1px solid #ccc')
-    .style('border-radius', '4px')
-    .style('box-shadow', '0 2px 8px rgba(0,0,0,0.15)')
+    .style('padding', '14px 18px')
+    .style('font-size', '13px')
+    .style('background', 'rgba(15, 23, 42, 0.95)')
+    .style('color', '#fff')
+    .style('border-radius', '10px')
+    .style('box-shadow', '0 8px 24px rgba(0, 0, 0, 0.3)')
+    .style('z-index', '99999')
+    .style('max-width', '320px')
     .style('opacity', 0);
   
   // Create crosshair group
@@ -903,8 +904,12 @@ loadQ1Data().then(data => {
         crosshair.style('display', null);
         verticalLine.attr('x1', xScale(month)).attr('x2', xScale(month));
         
-        // Build tooltip content
-        let tooltipHtml = `<div style="font-weight: 600; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #ddd;">${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1]} 2024</div>`;
+        // Build enhanced tooltip content with clearer labels
+        const monthName = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1];
+        let tooltipHtml = `
+          <div class="tooltip-header" style="font-weight: 700; font-size: 14px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            📅 ${monthName} 2024
+          </div>`;
         
         // If a jurisdiction is isolated, only show that one
         const jurisdictionsToShow = isolatedJurisdiction ? [isolatedJurisdiction] : selected;
@@ -931,13 +936,29 @@ loadQ1Data().then(data => {
         }).filter(d => d.value !== null)
           .sort((a, b) => b.value - a.value); // Sort by value descending
         
-        monthData.forEach(d => {
-          tooltipHtml += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
-            <div style="width: 12px; height: 12px; background: ${getCurrentColorScale()(d.jurisdiction)}; border-radius: 2px;"></div>
+        // Add header for fines section
+        if (monthData.length > 1) {
+          tooltipHtml += `<div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Speeding Fines Issued</div>`;
+        }
+        
+        monthData.forEach((d, i) => {
+          const isMax = i === 0 && monthData.length > 1;
+          tooltipHtml += `<div style="display: flex; align-items: center; gap: 10px; margin: 6px 0; ${isMax ? 'background: rgba(255,255,255,0.1); padding: 6px 8px; border-radius: 6px; margin: 8px -8px;' : ''}">
+            <div style="width: 14px; height: 14px; background: ${getCurrentColorScale()(d.jurisdiction)}; border-radius: 3px; flex-shrink: 0;"></div>
             <span style="flex: 1; font-weight: 500;">${d.jurisdiction}</span>
-            <span style="font-weight: 600;">${d.value.toLocaleString()}</span>
+            <span style="font-weight: 700; font-size: 14px;">${d.value.toLocaleString()}</span>
+            ${isMax && monthData.length > 1 ? '<span style="font-size: 10px; background: #10b981; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">Highest</span>' : ''}
           </div>`;
         });
+        
+        // Add total if showing multiple jurisdictions
+        if (monthData.length > 1) {
+          const total = monthData.reduce((sum, d) => sum + d.value, 0);
+          tooltipHtml += `<div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: space-between;">
+            <span style="color: rgba(255,255,255,0.7);">Total (${monthData.length} jurisdictions)</span>
+            <span style="font-weight: 700;">${total.toLocaleString()}</span>
+          </div>`;
+        }
         
         tooltip
           .style('opacity', 1)
@@ -1128,6 +1149,116 @@ loadQ1Data().then(data => {
   // Initial render
   updateChart();
   
+  // ===== ADDITIONAL FILTER CONTROLS =====
+  const compareModeSelect = d3.select('#rq1-compare-mode');
+  const displayModeSelect = d3.select('#rq1-display-mode');
+  const resetFiltersBtn = d3.select('#rq1-reset-filters');
+  
+  // Pre-defined jurisdiction groups
+  const jurisdictionGroups = {
+    'all': jurisdictions,
+    'top3': ['VIC', 'NSW', 'QLD'],
+    'territories': ['ACT', 'NT'],
+    'major': ['NSW', 'VIC', 'QLD']
+  };
+  
+  // Compare mode change handler
+  if (!compareModeSelect.empty()) {
+    compareModeSelect.on('change', function() {
+      const mode = this.value;
+      const targetJurisdictions = jurisdictionGroups[mode] || jurisdictions;
+      
+      // Update checkboxes
+      jurisdictions.forEach(j => {
+        checkboxes[j].checked = targetJurisdictions.includes(j);
+      });
+      
+      // Update select all checkbox
+      selectAllCheckbox.node().checked = targetJurisdictions.length === jurisdictions.length;
+      
+      // Update dropdown text
+      dropdownButton.html(`<span>${getSelectedText()}</span><span style="font-size: 0.7em;">▼</span>`);
+      
+      // Clear isolation and update chart
+      isolatedJurisdiction = null;
+      hoveredJurisdiction = null;
+      updateChart();
+      populateDataTable();
+    });
+  }
+  
+  // Display mode change handler (normalized view)
+  let isNormalized = false;
+  if (!displayModeSelect.empty()) {
+    displayModeSelect.on('change', function() {
+      isNormalized = this.value === 'normalized';
+      
+      if (isNormalized) {
+        // Calculate max value for each month across all jurisdictions
+        const monthMaxes = {};
+        for (let m = 1; m <= 12; m++) {
+          const monthData = data.filter(d => d.Month === m);
+          monthMaxes[m] = d3.max(monthData, d => d.Sum_FINES) || 1;
+        }
+        
+        // Create normalized version of data (store original)
+        window.rq1OriginalData = data;
+        window.rq1MonthMaxes = monthMaxes;
+        
+        // Update Y axis label
+        svg.select('.axis-label').filter(function() {
+          return d3.select(this).text() === 'Total Fines';
+        }).text('Normalized (%)');
+      } else {
+        // Restore original Y axis label
+        svg.select('.axis-label').filter(function() {
+          return d3.select(this).text() === 'Normalized (%)';
+        }).text('Total Fines');
+      }
+      
+      updateChart();
+    });
+  }
+  
+  // Reset all filters
+  if (!resetFiltersBtn.empty()) {
+    resetFiltersBtn.on('click', function() {
+      // Reset compare mode
+      if (!compareModeSelect.empty()) compareModeSelect.property('value', 'all');
+      
+      // Reset display mode
+      if (!displayModeSelect.empty()) {
+        displayModeSelect.property('value', 'absolute');
+        isNormalized = false;
+        svg.select('.axis-label').filter(function() {
+          return d3.select(this).text() === 'Normalized (%)';
+        }).text('Total Fines');
+      }
+      
+      // Reset all checkboxes
+      jurisdictions.forEach(j => {
+        checkboxes[j].checked = true;
+      });
+      selectAllCheckbox.node().checked = true;
+      dropdownButton.html(`<span>${getSelectedText()}</span><span style="font-size: 0.7em;">▼</span>`);
+      
+      // Clear states
+      isolatedJurisdiction = null;
+      hoveredJurisdiction = null;
+      isColorBlindMode = false;
+      
+      // Reset color blind toggle appearance
+      toggleButton.select('rect')
+        .attr('fill', '#f3f4f6')
+        .attr('stroke', '#d1d5db');
+      toggleButton.selectAll('path, circle')
+        .attr('fill', '#374151');
+      
+      updateChart();
+      populateDataTable();
+    });
+  }
+  
   // Responsive resize handler with debouncing
   let resizeTimeout;
   window.addEventListener('resize', function() {
@@ -1179,6 +1310,123 @@ loadQ1Data().then(data => {
       location.reload();
     }, 100);
   });
+  
+  // ===== DATA TABLE FUNCTIONALITY =====
+  function populateDataTable() {
+    const tableBody = d3.select('#rq1-summary-table tbody');
+    if (tableBody.empty()) return;
+    
+    // Calculate stats for each jurisdiction
+    const jurisdictionStats = jurisdictions.map(jurisdiction => {
+      const jurData = data.filter(d => d.JURISDICTION === jurisdiction);
+      const fines = jurData.map(d => d.Sum_FINES);
+      const total = d3.sum(fines);
+      const average = d3.mean(fines);
+      const max = d3.max(fines);
+      const min = d3.min(fines);
+      const maxMonth = jurData.find(d => d.Sum_FINES === max);
+      const minMonth = jurData.find(d => d.Sum_FINES === min);
+      
+      // Calculate trend (comparing first 3 months vs last 3 months)
+      const firstThree = fines.slice(0, 3);
+      const lastThree = fines.slice(-3);
+      const firstAvg = d3.mean(firstThree) || 0;
+      const lastAvg = d3.mean(lastThree) || 0;
+      const trendPct = firstAvg > 0 ? ((lastAvg - firstAvg) / firstAvg * 100) : 0;
+      
+      return {
+        jurisdiction,
+        total,
+        average,
+        max,
+        min,
+        maxMonth: maxMonth ? maxMonth.Month : 0,
+        minMonth: minMonth ? minMonth.Month : 0,
+        trend: trendPct
+      };
+    });
+    
+    const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    // Sort by total (descending) initially
+    jurisdictionStats.sort((a, b) => b.total - a.total);
+    
+    // Clear and populate table
+    tableBody.html('');
+    
+    jurisdictionStats.forEach(stat => {
+      const trendClass = stat.trend > 2 ? 'trend-up' : (stat.trend < -2 ? 'trend-down' : 'trend-neutral');
+      const trendIcon = stat.trend > 2 ? '↑' : (stat.trend < -2 ? '↓' : '→');
+      const trendText = `${trendIcon} ${Math.abs(stat.trend).toFixed(1)}%`;
+      
+      const row = tableBody.append('tr');
+      
+      row.append('td')
+        .html(`<div class="jurisdiction-cell">
+          <span class="color-indicator" style="background: ${getCurrentColorScale()(stat.jurisdiction)}"></span>
+          <span>${stat.jurisdiction}</span>
+        </div>`);
+      
+      row.append('td').text(stat.total.toLocaleString());
+      row.append('td').text(Math.round(stat.average).toLocaleString());
+      row.append('td').html(`<strong>${monthNames[stat.maxMonth]}</strong> (${stat.max.toLocaleString()})`);
+      row.append('td').html(`<strong>${monthNames[stat.minMonth]}</strong> (${stat.min.toLocaleString()})`);
+      row.append('td')
+        .attr('class', trendClass)
+        .text(trendText);
+    });
+    
+    // Add sorting functionality
+    d3.selectAll('#rq1-summary-table th[data-sort]').on('click', function() {
+      const sortKey = d3.select(this).attr('data-sort');
+      const currentDir = d3.select(this).classed('sorted-asc') ? 'asc' : 
+                        (d3.select(this).classed('sorted-desc') ? 'desc' : 'none');
+      
+      // Reset all headers
+      d3.selectAll('#rq1-summary-table th').classed('sorted-asc', false).classed('sorted-desc', false);
+      
+      // Determine new direction
+      const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+      d3.select(this).classed(`sorted-${newDir}`, true);
+      
+      // Sort data
+      jurisdictionStats.sort((a, b) => {
+        let aVal = a[sortKey] || a.jurisdiction;
+        let bVal = b[sortKey] || b.jurisdiction;
+        if (typeof aVal === 'string') {
+          return newDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        }
+        return newDir === 'asc' ? aVal - bVal : bVal - aVal;
+      });
+      
+      // Re-render table
+      tableBody.html('');
+      jurisdictionStats.forEach(stat => {
+        const trendClass = stat.trend > 2 ? 'trend-up' : (stat.trend < -2 ? 'trend-down' : 'trend-neutral');
+        const trendIcon = stat.trend > 2 ? '↑' : (stat.trend < -2 ? '↓' : '→');
+        const trendText = `${trendIcon} ${Math.abs(stat.trend).toFixed(1)}%`;
+        
+        const row = tableBody.append('tr');
+        
+        row.append('td')
+          .html(`<div class="jurisdiction-cell">
+            <span class="color-indicator" style="background: ${getCurrentColorScale()(stat.jurisdiction)}"></span>
+            <span>${stat.jurisdiction}</span>
+          </div>`);
+        
+        row.append('td').text(stat.total.toLocaleString());
+        row.append('td').text(Math.round(stat.average).toLocaleString());
+        row.append('td').html(`<strong>${monthNames[stat.maxMonth]}</strong> (${stat.max.toLocaleString()})`);
+        row.append('td').html(`<strong>${monthNames[stat.minMonth]}</strong> (${stat.min.toLocaleString()})`);
+        row.append('td')
+          .attr('class', trendClass)
+          .text(trendText);
+      });
+    });
+  }
+  
+  // Populate table after initial render
+  setTimeout(populateDataTable, 100);
   
 }).catch(err => {
   console.error('Failed to load Q1 data:', err);

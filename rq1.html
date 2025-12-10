@@ -53,6 +53,30 @@
                 <p style="margin-bottom: 1.5rem; color: #666;">Select jurisdictions to compare monthly fine trends throughout 2024.</p>
                 
                 <div id="rq1-controls"></div>
+                
+                <!-- Additional Filter Controls -->
+                <div class="additional-filters" style="display: flex; gap: 16px; margin: 16px 0; flex-wrap: wrap; align-items: center;">
+                    <label class="control-label" style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-weight: 500; color: #374151;">Compare:</span>
+                        <select id="rq1-compare-mode" class="control-select" style="min-width: 160px;">
+                            <option value="all">All Selected</option>
+                            <option value="top3">Top 3 States</option>
+                            <option value="territories">Territories Only</option>
+                            <option value="major">Major States (NSW, VIC, QLD)</option>
+                        </select>
+                    </label>
+                    <label class="control-label" style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-weight: 500; color: #374151;">Display:</span>
+                        <select id="rq1-display-mode" class="control-select" style="min-width: 140px;">
+                            <option value="absolute">Absolute Numbers</option>
+                            <option value="normalized">Normalized (0-100%)</option>
+                        </select>
+                    </label>
+                    <button id="rq1-reset-filters" class="reset-btn" style="padding: 8px 16px; background: var(--beige-100); border: 1px solid var(--beige-300); border-radius: 6px; cursor: pointer; font-weight: 500; color: var(--beige-700);">
+                        Reset All
+                    </button>
+                </div>
+                
                 <div id="rq1-chart"></div>
             </div>
 
@@ -71,6 +95,36 @@
                     <li><strong>Hover for Details:</strong> Move your mouse over the chart to see a vertical dashed line with exact values for all visible jurisdictions</li>
                     <li><strong>Click to Focus:</strong> Click on a line <strong>OR</strong> legend item to isolate that jurisdiction with minimum and maximum values highlighted</li>
                 </ul>
+            </div>
+
+            <!-- Data Overview Table -->
+            <div id="rq1-data-table" class="data-table-container" style="margin: 30px 0;">
+                <h3 style="margin-bottom: 15px; color: #1f2937; font-size: 1.25rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    Data Overview Table
+                </h3>
+                <p style="color: #6b7280; margin-bottom: 15px; font-size: 0.9rem;">Summary statistics for each jurisdiction. Click column headers to sort.</p>
+                <div style="overflow-x: auto;">
+                    <table id="rq1-summary-table" class="summary-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="jurisdiction">Jurisdiction ↕</th>
+                                <th data-sort="total">Total Fines ↕</th>
+                                <th data-sort="average">Monthly Avg ↕</th>
+                                <th data-sort="max">Peak Month ↕</th>
+                                <th data-sort="min">Lowest Month ↕</th>
+                                <th data-sort="trend">Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="insights">
