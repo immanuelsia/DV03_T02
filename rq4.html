@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RQ4: Age Group  | Speeding Enforcement Insights Dashboard</title>
+    <title>RQ4: Age Group | Speeding Enforcement Insights Dashboard</title>
     <link rel="stylesheet" href="css/styles-base.css">
     <link rel="stylesheet" href="css/styles-questions.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- D3.js and TopoJSON -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script src="https://unpkg.com/topojson-client@3"></script>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="nav-brand">
@@ -33,7 +31,6 @@
         </div>
     </nav>
 
-    <!-- Page Header -->
     <section class="page-header">
         <div class="container">
             <div class="breadcrumb">
@@ -42,25 +39,36 @@
             <h1 class="page-title">Average Age Group Offences by Jurisdiction</h1>
    
              <p class="page-description">
-         Identifying how the most recent average age group of speeding offences vary across jurisdictions.
+          Identifying how the most recent average age group of speeding offences vary across jurisdictions.
                 <br><span style="font-size: 0.9em; color: #666; font-weight: 600; font-style: italic;">Data Period: 2024 only</span>
             </p>
         </div>
     </section>
 
-    <!-- Main Content -->
     <section class="section section-light">
         <div class="container">
             <section class="map-card" id="card-rq4">
                 <h2 style="margin:12px 18px 0">Age Group Analysis Map</h2>
-                <div class="map-inner">
+                
+                <div id="legend-container-rq4" style="padding: 10px 18px 0 18px; min-height: 60px;"></div>
+
+                <div class="map-inner" style="position: relative;">
                     <svg id="rq4-map" role="img" aria-label="RQ4 Map"></svg>
+                    
                     <div class="controls">
                         <button id="zoomIn-rq4" title="Zoom In">+</button>
                         <button id="zoomOut-rq4" title="Zoom Out">−</button>
                         <button id="reset-rq4" title="Reset View">⌂</button>
                     </div>
+
+                    <div class="info-panel" id="infoPanel-rq4">
+                        <h3>Feature Info</h3>
+                        <div class="hint">Hover over features to see details</div>
+                    </div>
+                    
+                    <div class="loading" id="loading-rq4">Loading data...</div>
                 </div>
+
                 <div class="year-control" style="padding:12px 18px;display:flex;align-items:center;gap:12px;">
                     <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
                         <div style="display:flex;gap:8px;align-items:center;">
@@ -75,12 +83,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="info-panel" id="infoPanel-rq4">
-                    <h3>Feature Info</h3>
-                    <div class="hint">Hover over features to see details</div>
-                </div>
-                <div class="loading" id="loading-rq4">Loading data...</div>
             </section>
 
             <div class="insights">
@@ -100,7 +102,6 @@
         </div>
     </section>
 
-    <!-- Analysis Section -->
     <section class="section section-dark">
         <div class="container">
             <h2 class="section-title">Age Group Analysis</h2>
@@ -177,7 +178,6 @@
         </div>
     </section>
 
-    <!-- Navigation -->
     <section class="section section-light">
         <div class="container">
             <div class="page-navigation">
@@ -187,7 +187,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -206,9 +205,6 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="main.js"></script>
     <script src="js/rq4.js"></script>
 </body>
 </html>
-
