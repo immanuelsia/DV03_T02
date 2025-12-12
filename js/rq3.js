@@ -121,7 +121,7 @@
       if (camPerc != null && polPerc != null) {
         const data = [ {label:'Camera', value:camPerc}, {label:'Police', value:polPerc} ];
         
-        // SCALING LOGIC: Smaller on mobile
+        // SCALING LOGIC: Smaller on mobile (140px vs 180px)
         const w = isMobileView ? 140 : 180;
         const h = isMobileView ? 140 : 180;
         const r = Math.min(w,h)/2;
@@ -520,8 +520,18 @@
         .text(Math.round(max));
     }
     
-    // Handle resize
-    window.addEventListener("resize", () => {
+    // Handle resize with Debounce
+    // Helper function to prevent rapid-fire events
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this, args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
+    window.addEventListener("resize", debounce(() => {
       const newIsMobile = window.innerWidth <= 768;
       const newW = mapContainer ? Math.max(200, mapContainer.clientWidth) : window.innerWidth;
       const newH = mapContainer ? Math.max(200, mapContainer.clientHeight) : (newIsMobile ? 350 : window.innerHeight);
@@ -539,7 +549,7 @@
       // RESET InfoPanel to Desktop State if resized
       if (!newIsMobile) {
         infoPanel
-            .style('position', 'relative') // Let CSS absolute rule take over
+            .style('position', 'relative')
             .style('left', '')
             .style('top', '')
             .style('bottom', '') // Clear bottom property
@@ -556,7 +566,7 @@
             infoPanel.style('display', 'none');
         }
       }
-    });
+    }, 250));
     
     // Set up year slider handler (after CSV loads)
     function setupSliderHandler() {

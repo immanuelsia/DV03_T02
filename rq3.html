@@ -52,11 +52,19 @@
 
                 <div class="map-inner" style="position: relative;">
                     <svg id="rq3-map" role="img" aria-label="RQ3 Map"></svg>
+                    
                     <div class="controls">
                         <button id="zoomIn-rq3" title="Zoom In">+</button>
                         <button id="zoomOut-rq3" title="Zoom Out">−</button>
                         <button id="reset-rq3" title="Reset View">⌂</button>
                     </div>
+
+                    <div class="info-panel" id="infoPanel-rq3">
+                        <h3>Feature Info</h3>
+                        <div class="hint">Hover over features to see details</div>
+                    </div>
+                    
+                    <div class="loading" id="loading-rq3">Loading data...</div>
                 </div>
                 
                 <div class="year-control" style="padding:12px 18px;display:flex;align-items:center;gap:12px;">
@@ -72,12 +80,6 @@
                         <input id="year-slider-rq3" type="range" min="2018" max="2024" step="1" value="2024" style="width:100%" />
                     </div>
                 </div>
-
-                <div class="info-panel" id="infoPanel-rq3" style="position: relative;">
-                    <h3>Feature Info</h3>
-                    <div class="hint">Hover over features to see details</div>
-                </div>
-                <div class="loading" id="loading-rq3">Loading data...</div>
             </section>
 
             <div class="insights" style="margin-top: 30px;">
