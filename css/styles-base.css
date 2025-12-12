@@ -156,6 +156,87 @@ body {
     width: 100%;
 }
 
+/* ===== MOBILE HAMBURGER MENU ===== */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--gray-700);
+    border-radius: 2px;
+    transition: var(--transition);
+    position: relative;
+}
+
+.nav-toggle span::before,
+.nav-toggle span::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background: var(--gray-700);
+    border-radius: 2px;
+    transition: var(--transition);
+    left: 0;
+}
+
+.nav-toggle span::before {
+    top: -7px;
+}
+
+.nav-toggle span::after {
+    top: 7px;
+}
+
+/* Hamburger animation when open */
+.nav-toggle.active span {
+    background: transparent;
+}
+
+.nav-toggle.active span::before {
+    top: 0;
+    transform: rotate(45deg);
+}
+
+.nav-toggle.active span::after {
+    top: 0;
+    transform: rotate(-45deg);
+}
+
+/* Mobile menu overlay */
+.nav-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.nav-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* ===== SECTIONS ===== */
 .section {
     padding: 5rem 2rem;
@@ -337,17 +418,183 @@ body {
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 768px) {
+
+/* Tablet and below */
+@media (max-width: 1024px) {
     .nav-menu {
+        gap: 1.5rem;
+    }
+    
+    .nav-link {
+        font-size: 0.85rem;
+    }
+    
+    .section {
+        padding: 4rem 1.5rem;
+    }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+    
+    /* Show hamburger menu */
+    .nav-toggle {
+        display: flex;
+    }
+    
+    .nav-overlay {
+        display: block;
+    }
+    
+    .nav-container {
+        padding: 0.75rem 1rem;
+    }
+    
+    .nav-brand h1 {
+        font-size: 1rem;
+    }
+    
+    .nav-subtitle {
+        font-size: 0.65rem;
+    }
+    
+    /* Mobile menu styles */
+    .nav-menu {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 280px;
+        max-width: 80vw;
+        height: 100vh;
+        background: white;
+        flex-direction: column;
+        padding: 5rem 1.5rem 2rem;
+        gap: 0;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+        z-index: 999;
+        overflow-y: auto;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .nav-menu.active {
+        display: flex;
+        transform: translateX(0);
+    }
+    
+    .nav-menu li {
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    .nav-link {
+        display: block;
+        padding: 1rem 0.5rem;
+        font-size: 1rem;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .nav-link::after {
+        display: none;
+    }
+    
+    .nav-link.active {
+        background: var(--beige-50);
+        border-radius: var(--radius-md);
+    }
+    
+    /* Sections */
+    .section {
+        padding: 2.5rem 1rem;
+    }
+    
+    .section-header {
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.75rem;
+    }
+    
+    .section-description {
+        font-size: 1rem;
+    }
+    
+    /* Buttons - ensure 44px min touch target */
+    .btn {
+        padding: 0.875rem 1.5rem;
+        min-height: 44px;
+        font-size: 0.9375rem;
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    /* Footer */
+    .footer {
+        padding: 2rem 1rem 1.5rem;
+    }
+    
+    .footer-content {
+        gap: 1.5rem;
+    }
+    
+    .footer-section h3 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+    
+    .nav-brand h1 {
+        font-size: 0.9rem;
+    }
+    
+    .nav-subtitle {
         display: none;
     }
     
     .section {
-        padding: 3rem 1rem;
+        padding: 2rem 0.75rem;
     }
     
     .section-title {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
+    
+    .container {
+        padding: 0 0.5rem;
+    }
+}
+
+/* Ensure touch targets are at least 44px */
+@media (pointer: coarse) {
+    .btn,
+    .nav-link,
+    .nav-toggle,
+    button,
+    input[type="button"],
+    input[type="submit"],
+    select {
+        min-height: 44px;
+    }
+    
+    input[type="range"] {
+        height: 44px;
+    }
+}
+
+/* Prevent body scroll when mobile menu is open */
+body.menu-open {
+    overflow: hidden;
 }
 

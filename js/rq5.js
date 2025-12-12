@@ -240,20 +240,29 @@ function renderBubbleChart() {
   // Clear previous chart (but keep the colorblind button)
   d3.select('#rq5-chart').selectAll('*:not(#colorblind-toggle)').remove();
   
-  // Dimensions
+  // Dimensions - responsive
   const container = document.getElementById('rq5-chart');
-  const containerWidth = container.clientWidth || 1000;
-  const margin = { top: 80, right: 60, bottom: 100, left: 100 };
-  const width = Math.max(600, containerWidth) - margin.left - margin.right;
-    const height = 600 - margin.top - margin.bottom;
+  const containerWidth = container.clientWidth || 800;
+  const isMobile = window.innerWidth <= 768;
+  const margin = isMobile 
+    ? { top: 60, right: 30, bottom: 80, left: 60 }
+    : { top: 80, right: 60, bottom: 100, left: 100 };
+  const baseWidth = isMobile ? Math.max(containerWidth, 350) : Math.max(600, containerWidth);
+  const width = baseWidth - margin.left - margin.right;
+  const height = (isMobile ? 450 : 600) - margin.top - margin.bottom;
+  const svgWidth = width + margin.left + margin.right;
+  const svgHeight = height + margin.top + margin.bottom;
     
-    // Create SVG
+  // Create SVG with viewBox for responsiveness
   const svg = d3.select('#rq5-chart')
-        .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+    .append('svg')
+    .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('width', '100%')
+    .style('height', 'auto')
+    .style('min-height', isMobile ? '350px' : '500px')
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
     
   const colors = getColors();
   const ageGroupOrder = ['Underage', '17-25', '26-39', '40-64', '65+'];
@@ -497,18 +506,27 @@ function renderBarChart() {
   // Clear previous chart (but keep the colorblind button)
   d3.select('#rq5-chart').selectAll('*:not(#colorblind-toggle)').remove();
   
-  // Dimensions
+  // Dimensions - responsive
   const container = document.getElementById('rq5-chart');
-  const containerWidth = container.clientWidth || 1000;
-  const margin = { top: 80, right: 180, bottom: 80, left: 100 };
-  const width = Math.max(700, containerWidth) - margin.left - margin.right;
-  const height = 600 - margin.top - margin.bottom;
+  const containerWidth = container.clientWidth || 800;
+  const isMobile = window.innerWidth <= 768;
+  const margin = isMobile 
+    ? { top: 60, right: 20, bottom: 100, left: 50 }
+    : { top: 80, right: 180, bottom: 80, left: 100 };
+  const baseWidth = isMobile ? Math.max(containerWidth, 350) : Math.max(700, containerWidth);
+  const width = baseWidth - margin.left - margin.right;
+  const height = (isMobile ? 450 : 600) - margin.top - margin.bottom;
+  const svgWidth = width + margin.left + margin.right;
+  const svgHeight = height + margin.top + margin.bottom;
   
-  // Create SVG
+  // Create SVG with viewBox for responsiveness
   const svg = d3.select('#rq5-chart')
     .append('svg')
-    .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom)
+    .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('width', '100%')
+    .style('height', 'auto')
+    .style('min-height', isMobile ? '400px' : '500px')
     .append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
   
@@ -823,3 +841,23 @@ if (document.readyState === 'loading') {
 } else {
     loadRQ5Data();
 }
+
+// Responsive resize handler
+let rq5ResizeTimeout;
+let rq5LastWidth = window.innerWidth;
+
+window.addEventListener('resize', function() {
+  clearTimeout(rq5ResizeTimeout);
+  rq5ResizeTimeout = setTimeout(function() {
+    const currentWidth = window.innerWidth;
+    // Only redraw if crossing the mobile threshold or significant width change
+    const crossedThreshold = (rq5LastWidth <= 768 && currentWidth > 768) || 
+                             (rq5LastWidth > 768 && currentWidth <= 768);
+    const significantChange = Math.abs(currentWidth - rq5LastWidth) > 100;
+    
+    if ((crossedThreshold || significantChange) && rq5Data.length > 0) {
+      renderVisualization();
+    }
+    rq5LastWidth = currentWidth;
+  }, 250);
+});

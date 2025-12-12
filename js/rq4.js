@@ -5,12 +5,15 @@
 
 // Use the map card inner dimensions so the SVG fills the card
 const mapContainer = document.getElementById('rq4-map') ? document.getElementById('rq4-map').parentElement : document.querySelector('.map-container');
+const isMobile = window.innerWidth <= 768;
 let width = mapContainer ? Math.max(200, mapContainer.clientWidth) : 900;
-let height = mapContainer ? Math.max(200, mapContainer.clientHeight) : 600;
+let height = mapContainer ? Math.max(200, mapContainer.clientHeight) : (isMobile ? 350 : 600);
 
 const svg = d3.select("#rq4-map")
-  .attr("width", width)
-  .attr("height", height)
+  .attr("viewBox", `0 0 ${width} ${height}`)
+  .attr("preserveAspectRatio", "xMidYMid meet")
+  .style("width", "100%")
+  .style("height", isMobile ? "350px" : "100%")
   .style('cursor','grab');
 
 const g = svg.append("g");
@@ -449,9 +452,11 @@ d3.select("#mode-65-and-over-rq4").on("click", () => setQ4Mode('65 and over'));
 
 // Handle resize
 window.addEventListener("resize", () => {
+  const newIsMobile = window.innerWidth <= 768;
   const newW = mapContainer ? Math.max(200, mapContainer.clientWidth) : window.innerWidth;
-  const newH = mapContainer ? Math.max(200, mapContainer.clientHeight) : window.innerHeight;
-  svg.attr("width", newW).attr("height", newH);
+  const newH = mapContainer ? Math.max(200, mapContainer.clientHeight) : (newIsMobile ? 350 : window.innerHeight);
+  svg.attr("viewBox", `0 0 ${newW} ${newH}`)
+     .style("height", newIsMobile ? "350px" : "100%");
 
   if (geojsonData && projection) {
     projection.fitSize([newW, newH], geojsonData);

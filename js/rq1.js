@@ -167,10 +167,13 @@ loadQ1Data().then(data => {
       .style('width', '100%');
   }
   
-  // Create SVG
+  // Create SVG with viewBox for responsiveness
   const svg = chartContainer.append('svg')
-    .attr('width', containerWidth)
-    .attr('height', chartHeight);
+    .attr('viewBox', `0 0 ${containerWidth} ${chartHeight}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('width', '100%')
+    .style('height', 'auto')
+    .style('min-height', isMobile ? '300px' : '400px');
   
   const g = svg.append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
@@ -1260,55 +1263,30 @@ loadQ1Data().then(data => {
   }
   
   // Responsive resize handler with debouncing
+  // ViewBox handles scaling automatically, only need to handle major layout changes
   let resizeTimeout;
+  let lastWidth = window.innerWidth;
+  
   window.addEventListener('resize', function() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(function() {
-      const newIsMobile = window.innerWidth <= 768;
-      const newIsLandscape = window.innerWidth > window.innerHeight;
+      const currentWidth = window.innerWidth;
+      // Only reload if crossing the mobile/desktop threshold
+      const crossedThreshold = (lastWidth <= 768 && currentWidth > 768) || 
+                               (lastWidth > 768 && currentWidth <= 768);
       
-      // Get new container width
-      const newContainerWidth = chartContainer.node().getBoundingClientRect().width;
-      
-      // Update SVG width to match container dynamically
-      if (newContainerWidth > 0 && Math.abs(newContainerWidth - containerWidth) > 20) {
-        containerWidth = newContainerWidth;
-        const newWidth = newContainerWidth - margin.left - margin.right;
-        
-        // Update SVG dimensions
-        svg.attr('width', newContainerWidth);
-        
-        // Recalculate x-scale range
-        xScale.range([0, newWidth]);
-        
-        // Update overlay width
-        overlay.attr('width', newWidth);
-        
-        // Update legend position
-        legend.attr('transform', `translate(${newWidth + margin.left + 20}, ${margin.top})`);
-        
-        // Update axis label position
-        svg.select('.axis-label').filter(function() {
-          return d3.select(this).text() === 'Month';
-        }).attr('x', margin.left + newWidth / 2);
-        
-        // Redraw everything with new dimensions
-        updateChart();
-      }
-      
-      // Reload page if switching between mobile/desktop or portrait/landscape
-      if (newIsMobile !== isMobile || 
-          (newIsMobile && newIsLandscape !== isLandscape)) {
+      if (crossedThreshold) {
         location.reload();
       }
-    }, 150);
+      lastWidth = currentWidth;
+    }, 300);
   });
   
-  // Handle orientation change
+  // Handle orientation change on mobile
   window.addEventListener('orientationchange', function() {
     setTimeout(function() {
       location.reload();
-    }, 100);
+    }, 200);
   });
   
   // ===== DATA TABLE FUNCTIONALITY =====

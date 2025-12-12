@@ -90,101 +90,82 @@ if (hero) {
     heroObserver.observe(hero);
 }
 
-// ===== RESPONSIVE NAVIGATION TOGGLE (for mobile) =====
+// ===== MOBILE NAVIGATION =====
 
 function setupMobileNav() {
-    if (window.innerWidth <= 768) {
-        const navContainer = document.querySelector('.nav-container');
-        const navMenu = document.querySelector('.nav-menu');
+    const navContainer = document.querySelector('.nav-container');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    // Create hamburger button if it doesn't exist
+    if (!document.querySelector('.nav-toggle')) {
+        const navToggle = document.createElement('button');
+        navToggle.className = 'nav-toggle';
+        navToggle.setAttribute('aria-label', 'Toggle navigation menu');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.innerHTML = '<span></span>';
+        navContainer.appendChild(navToggle);
         
-        // Check if button already exists
-        if (!document.querySelector('.mobile-menu-button')) {
-            const menuButton = document.createElement('button');
-            menuButton.className = 'mobile-menu-button';
-            menuButton.setAttribute('aria-label', 'Toggle menu');
-            menuButton.innerHTML = `
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            `;
-            
-            // Add styles for mobile menu button
-            if (!document.querySelector('#mobile-menu-styles')) {
-                const style = document.createElement('style');
-                style.id = 'mobile-menu-styles';
-                style.textContent = `
-                    .mobile-menu-button {
-                        display: none;
-                        background: none;
-                        border: none;
-                        cursor: pointer;
-                        color: var(--gray-700);
-                        padding: 0.5rem;
-                    }
-                    
-                    @media (max-width: 768px) {
-                        .mobile-menu-button {
-                            display: block;
-                        }
-                        
-                        .nav-menu {
-                            display: none;
-                            position: absolute;
-                            top: 100%;
-                            left: 0;
-                            right: 0;
-                            background: white;
-                            flex-direction: column;
-                            padding: 1rem;
-                            box-shadow: var(--shadow-lg);
-                            border-top: 1px solid var(--gray-200);
-                            z-index: 999;
-                        }
-                        
-                        .nav-menu.active {
-                            display: flex;
-                        }
-                        
-                        .nav-menu li {
-                            width: 100%;
-                        }
-                        
-                        .nav-link {
-                            display: block;
-                            padding: 0.75rem 1rem;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            navContainer.appendChild(menuButton);
-            
-            menuButton.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-            });
-            
-            // Close menu when clicking a link
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    navMenu.classList.remove('active');
-                });
-            });
-            
-            // Close menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!navContainer.contains(e.target)) {
-                    navMenu.classList.remove('active');
-                }
-            });
+        // Create overlay if it doesn't exist
+        if (!document.querySelector('.nav-overlay')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'nav-overlay';
+            document.body.appendChild(overlay);
         }
+        
+        const overlay = document.querySelector('.nav-overlay');
+        
+        // Toggle menu function
+        function toggleMenu() {
+            const isOpen = navMenu.classList.contains('active');
+            
+            navMenu.classList.toggle('active');
+            navToggle.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+            
+            navToggle.setAttribute('aria-expanded', !isOpen);
+        }
+        
+        // Close menu function
+        function closeMenu() {
+            navMenu.classList.remove('active');
+            navToggle.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+        }
+        
+        // Event listeners
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+        
+        overlay.addEventListener('click', closeMenu);
+        
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+        
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                closeMenu();
+            }
+        });
+        
+        // Close menu on resize if going to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeMenu();
+            }
+        });
     }
 }
 
-setupMobileNav();
-window.addEventListener('resize', setupMobileNav);
+// Initialize mobile nav
+document.addEventListener('DOMContentLoaded', setupMobileNav);
 
 // ===== PRINT FRIENDLY =====
 

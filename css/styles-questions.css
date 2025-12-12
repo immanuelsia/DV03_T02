@@ -128,6 +128,28 @@
     max-height: 500px;
 }
 
+/* ===== RESPONSIVE SVG CONTAINERS ===== */
+.chart-container svg,
+.viz-card svg,
+#rq1-chart svg,
+#rq2-chart svg,
+#rq5-chart svg {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    display: block;
+}
+
+/* Ensure SVG viewBox scaling works */
+.chart-container svg[viewBox],
+.viz-card svg[viewBox],
+#rq1-chart svg[viewBox],
+#rq2-chart svg[viewBox],
+#rq5-chart svg[viewBox] {
+    width: 100%;
+    height: auto;
+}
+
 .chart-container-small {
     background: white;
     padding: 1.5rem;
@@ -571,7 +593,7 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  z-index: 1000;
+  z-index: 900;
   background: white;
   padding: 15px 20px;
   border-radius: 8px;
@@ -628,7 +650,7 @@
   position: absolute;
   top: 12px;
   left: 12px;
-  z-index: 1100;
+  z-index: 900;
   background: rgba(255,255,255,0.95);
   padding: 8px;
   border-radius: 8px;
@@ -636,7 +658,9 @@
 }
 
 .controls button {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 40px;
   height: 40px;
   margin: 5px 0;
@@ -644,7 +668,10 @@
   background: white;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1;
+  color: #333;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
@@ -1444,20 +1471,533 @@ body:has(#rq5-chart) .section {
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* ===== MOBILE RESPONSIVE FOR NEW COMPONENTS ===== */
+/* ===== COMPREHENSIVE MOBILE RESPONSIVE ===== */
+
+/* Tablet breakpoint */
+@media (max-width: 1024px) {
+  .page-header {
+    padding: 2.5rem 1.5rem 1rem;
+  }
+  
+  .page-title {
+    font-size: 2.25rem;
+  }
+  
+  .map-card {
+    margin: 24px auto 20px;
+  }
+  
+  .map-inner {
+    height: 450px;
+  }
+  
+  .analysis-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .insights {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  #infoPanel-rq3 {
+    max-width: 350px;
+    min-width: 300px;
+  }
+}
+
+/* Mobile breakpoint */
 @media (max-width: 768px) {
+  /* Page Header */
+  .page-header {
+    padding: 1.5rem 1rem 0.75rem;
+    margin-top: 60px;
+  }
+  
+  .breadcrumb {
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .page-description {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+  
+  /* Visualization Controls */
+  .viz-controls {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+  
+  .control-label {
+    width: 100%;
+  }
+  
+  .control-select {
+    width: 100%;
+    min-width: auto;
+    min-height: 44px;
+    font-size: 1rem;
+  }
+  
+  /* Chart Containers */
+  .viz-card,
+  .chart-container {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .viz-card h2,
+  .chart-container h2 {
+    font-size: 1.25rem;
+  }
+  
+  /* Map Card */
+  .map-card {
+    margin: 16px auto;
+    padding: 8px;
+    border-radius: 10px;
+  }
+  
+  .map-card h2 {
+    font-size: 1.125rem;
+    margin: 8px 12px 0;
+  }
+  
+  .map-inner {
+    height: 350px;
+    border-radius: 8px;
+  }
+  
+  /* Controls - ensure touch targets */
+  .controls {
+    top: 8px;
+    left: 8px;
+    padding: 6px;
+    border-radius: 6px;
+  }
+  
+  .controls button {
+    width: 44px;
+    height: 44px;
+    margin: 3px 0;
+    font-size: 20px;
+  }
+  
+  /* Mode Tabs */
+  .mode-tab {
+    padding: 10px 14px;
+    font-size: 0.8125rem;
+    min-height: 44px;
+  }
+  
+  #mode-tabs-rq3,
+  #mode-tabs-rq4 {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  /* Year Control */
+  .year-control {
+    padding: 10px 12px !important;
+    flex-direction: column;
+    gap: 10px !important;
+  }
+  
+  .year-control input[type="range"] {
+    height: 44px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+  }
+  
+  .year-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--beige-600);
+    cursor: pointer;
+  }
+  
+  .year-control input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--beige-600);
+    cursor: pointer;
+    border: none;
+  }
+  
+  /* Info Panel - hide by default on mobile, show only when content present */
+  .info-panel {
+    display: none;
+    position: absolute;
+    top: auto;
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    min-width: auto;
+    max-height: 35vh;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.2);
+    font-size: 11px;
+    background: white;
+    z-index: 100;
+  }
+  
+  /* Show info panel when it has content (property divs) */
+  .info-panel:has(.property) {
+    display: block;
+  }
+  
+  #infoPanel-rq3,
+  #infoPanel-rq4 {
+    max-width: none;
+    min-width: auto;
+    max-height: 40vh;
+  }
+  
+  .info-panel h3 {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  
+  .property {
+    font-size: 10px;
+    margin: 3px 0;
+  }
+  
+  .hint {
+    display: none;
+  }
+  
+  /* Q3 Info Panel Mobile */
+  .q3-info-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .q3-chart {
+    flex: 0 0 140px;
+    width: 140px;
+    height: 140px;
+  }
+  
+  .q3-info-block {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .q3-linechart {
+    height: 100px;
+  }
+  
+  .q3-linechart svg {
+    height: 100px;
+  }
+  
+  /* Insights */
+  .insights {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .insight-card {
+    padding: 1.25rem;
+  }
+  
+  .insight-card h4 {
+    font-size: 0.875rem;
+  }
+  
+  .insight-card p {
+    font-size: 0.875rem;
+  }
+  
+  /* Analysis Grid */
+  .analysis-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .analysis-card {
+    padding: 1.25rem;
+  }
+  
+  .analysis-card h3 {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .analysis-card h3 svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .analysis-card p {
+    font-size: 0.9375rem;
+  }
+  
+  .analysis-card ul li {
+    font-size: 0.875rem;
+    padding: 0.375rem 0;
+    padding-left: 1.25rem;
+  }
+  
+  /* Policy Grid */
+  .policy-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .policy-card {
+    padding: 1.5rem;
+  }
+  
+  /* Page Navigation */
+  .page-navigation {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  
+  .nav-btn {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    min-height: 48px;
+    justify-content: center;
+    font-size: 0.9375rem;
+  }
+  
+  /* Small Multiples */
+  .small-multiples {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .small-multiple-item {
+    padding: 1rem;
+  }
+  
+  .small-multiple-item h4 {
+    font-size: 0.9375rem;
+  }
+  
+  /* Data Tables */
   .data-table-container {
-    padding: 16px;
+    padding: 12px;
+    overflow-x: auto;
+  }
+  
+  .summary-table {
+    min-width: 500px;
   }
   
   .summary-table th,
   .summary-table td {
     padding: 10px 12px;
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
   }
   
-  .details-side-panel {
-    padding: 16px;
+  /* Tooltips */
+  .rq1-tooltip,
+  .rq2-tooltip,
+  .rq5-tooltip,
+  .enhanced-tooltip {
+    max-width: 260px;
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+  
+  /* State labels */
+  .state-label {
+    font-size: 12px;
+    stroke-width: 3px;
+  }
+  
+  /* Legend */
+  #legend-rq3,
+  #legend-rq4 {
+    margin: 8px 12px;
+    padding: 10px;
+  }
+  
+  #legend-rq3 svg,
+  #legend-rq4 svg {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* RQ5 Specific */
+  #rq5-chart {
+    min-height: 500px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .view-icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .colorblind-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .page-header {
+    padding: 1.25rem 0.75rem 0.5rem;
+  }
+  
+  .page-title {
+    font-size: 1.25rem;
+  }
+  
+  .page-description {
+    font-size: 0.875rem;
+  }
+  
+  .map-card {
+    padding: 6px;
+  }
+  
+  .map-card h2 {
+    font-size: 1rem;
+    margin: 6px 10px 0;
+  }
+  
+  .map-inner {
+    height: 280px;
+  }
+  
+  .mode-tab {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .info-panel {
+    max-height: 30vh;
+    padding: 8px;
+    font-size: 9px;
+  }
+  
+  .info-panel h3 {
+    font-size: 10px;
+  }
+  
+  .q3-chart {
+    flex: 0 0 80px;
+    width: 80px;
+    height: 80px;
+  }
+  
+  .insight-card,
+  .analysis-card {
+    padding: 1rem;
+  }
+  
+  /* 2-column findings on very small screens */
+  .insights {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .insight-card h4 {
+    font-size: 0.75rem;
+  }
+  
+  .insight-card p {
+    font-size: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Touch device optimizations */
+@media (pointer: coarse) {
+  .controls button,
+  .mode-tab,
+  .nav-btn,
+  .view-icon-btn,
+  .colorblind-btn,
+  .control-select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Increase touch target for checkboxes */
+  .checkbox-group label {
+    padding: 10px 12px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  /* Disable hover effects on touch */
+  .feature:hover {
+    fill-opacity: 0.3;
+    stroke-width: 1.2;
+    filter: none;
+  }
+  
+  .feature.highlighted,
+  .feature:active {
+    fill: #ff7800;
+    fill-opacity: 0.75;
+    stroke: #ff7800;
+    stroke-width: 3;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .page-header {
+    padding: 1rem 1rem 0.5rem;
+    margin-top: 50px;
+  }
+  
+  .map-inner {
+    height: 300px;
+  }
+  
+  .info-panel {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    bottom: auto;
+    left: auto;
+    max-width: 200px;
+    min-width: 160px;
+    max-height: 50vh;
+  }
+  
+  .info-panel:has(.property) {
+    display: block;
+  }
+  
+  .hero {
+    min-height: auto;
+    padding: 4rem 1rem 2rem;
   }
 }
 

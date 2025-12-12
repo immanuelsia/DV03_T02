@@ -302,34 +302,259 @@
 }
 
 /* ===== RESPONSIVE UPDATES ===== */
-@media (max-width: 768px) {
+
+/* Tablet */
+@media (max-width: 1024px) {
     .hero {
-        padding: 6rem 1rem 3rem;
+        padding: 7rem 1.5rem 3rem;
+        min-height: auto;
     }
     
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 3rem;
+    }
+    
+    .research-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .about-content {
+        gap: 2rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .hero {
+        padding: 5rem 1rem 2.5rem;
+        min-height: auto;
+    }
+    
+    .hero-content {
+        padding: 0 0.5rem;
+    }
+    
+    .hero-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.875rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-title br {
+        display: none;
     }
     
     .hero-description {
-        font-size: 1rem;
-    }
-    
-    .hero-stats {
-        flex-direction: column;
-        gap: 1rem;
+        font-size: 0.9375rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.7;
     }
     
     .hero-buttons {
         flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
     }
     
+    .hero-buttons .btn {
+        width: 100%;
+    }
+    
+    .hero-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        justify-content: center;
+    }
+    
+    .stat-card {
+        padding: 1rem 1.25rem;
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .stat-number {
+        font-size: 1.75rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    /* Research Grid */
     .research-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
     }
     
+    .research-card {
+        padding: 1.5rem;
+    }
+    
+    .research-number {
+        font-size: 2.5rem;
+        top: 0.75rem;
+        right: 1rem;
+    }
+    
+    .research-card h3 {
+        font-size: 1.25rem;
+        padding-right: 2.5rem;
+    }
+    
+    .research-card p {
+        font-size: 0.9375rem;
+        margin-bottom: 1rem;
+    }
+    
+    .research-tags {
+        gap: 0.375rem;
+    }
+    
+    .tag {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+    
+    /* Findings Grid */
+    .findings-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .finding-card {
+        padding: 1.5rem;
+    }
+    
+    .finding-icon {
+        font-size: 2.5rem;
+    }
+    
+    .finding-stat {
+        font-size: 1.5rem;
+    }
+    
+    .finding-card h4 {
+        font-size: 1rem;
+    }
+    
+    .finding-card p {
+        font-size: 0.875rem;
+    }
+    
+    /* About Section */
     .about-content {
         grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .about-text p {
+        font-size: 1rem;
+    }
+    
+    .about-features {
+        gap: 1rem;
+    }
+    
+    .feature-item strong {
+        font-size: 1rem;
+    }
+    
+    .feature-item p {
+        font-size: 0.9375rem;
+    }
+    
+    .about-stats-large {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .about-stat-item {
+        flex: 1;
+        min-width: calc(50% - 0.5rem);
+        padding: 1.25rem;
+    }
+    
+    .about-stat-value {
+        font-size: 1.75rem;
+    }
+    
+    .about-stat-label {
+        font-size: 0.8125rem;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .hero {
+        padding: 4.5rem 0.75rem 2rem;
+    }
+    
+    .hero-title {
+        font-size: 1.625rem;
+    }
+    
+    .hero-description {
+        font-size: 0.875rem;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .stat-card {
+        width: 100%;
+        padding: 0.875rem 1rem;
+    }
+    
+    .research-card {
+        padding: 1.25rem;
+    }
+    
+    .research-card h3 {
+        font-size: 1.125rem;
+    }
+    
+    .about-stat-item {
+        min-width: 100%;
+    }
+    
+    .findings-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .finding-card {
+        padding: 1rem;
+    }
+    
+    .finding-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .finding-stat {
+        font-size: 1.25rem;
+        margin: 0.5rem 0;
+    }
+    
+    .finding-card h4 {
+        font-size: 0.875rem;
+    }
+    
+    .finding-card p {
+        font-size: 0.75rem;
+        display: none;
     }
 }
 
